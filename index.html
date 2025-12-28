@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frigate NVR Configuration Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100" x-data="frigateConfig()">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">🎥 Frigate NVR Configuration Generator</h1>
+            <p class="text-gray-400">Professional-grade configuration tool for Frigate NVR</p>
+            <p class="text-sm text-gray-500 mt-2">Compatible with Frigate 0.14.x, 0.15.x, 0.16.x, and 0.17.x (stable releases)</p>
+        </div>
+
+        <!-- Frigate Appreciation Banner -->
+        <div class="bg-gradient-to-r from-blue-900 to-purple-900 border border-blue-500 rounded-lg p-6 mb-6">
+            <h3 class="text-xl font-bold mb-2">💙 Support the Frigate Team</h3>
+            <p class="text-gray-300 mb-3">Frigate is a free, open-source project built by dedicated developers. If you find it valuable, please consider:</p>
+            <div class="flex flex-wrap gap-4">
+                <a href="https://frigate.video/plus" target="_blank" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded font-semibold inline-flex items-center">
+                    ⭐ Subscribe to Frigate+ (Cloud features)
+                </a>
+                <a href="https://github.com/sponsors/blakeblackshear" target="_blank" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded font-semibold inline-flex items-center">
+                    ❤️ Donate to the Project
+                </a>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">Your support helps maintain and improve Frigate for everyone!</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-gray-700">
+            <button @click="activeTab = 'config'" 
+                    :class="activeTab === 'config' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
+                    class="px-4 py-2 font-semibold">⚙️ Configuration</button>
+            <button @click="activeTab = 'docs'" 
+                    :class="activeTab === 'docs' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
+                    class="px-4 py-2 font-semibold">📖 Documentation</button>
+            <button @click="activeTab = 'architecture'" 
+                    :class="activeTab === 'architecture' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
+                    class="px-4 py-2 font-semibold">🏗️ How It Works</button>
+            <button @click="activeTab = 'scripts'" 
+                    :class="activeTab === 'scripts' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
+                    class="px-4 py-2 font-semibold">💻 Scripts</button>
+            <button @click="activeTab = 'advanced'" 
+                    :class="activeTab === 'advanced' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
+                    class="px-4 py-2 font-semibold">🚀 Pro Tips</button>
+        </div>
+
+        <!-- Configuration Tab -->
+        <div x-show="activeTab === 'config'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Left Panel: Inputs -->
+            <div class="space-y-6">
+                
+                <!-- System Settings -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">System Settings</h2>
+                    
+                    <label class="block mb-4">
+                        <span class="text-gray-300 block mb-2">Hardware Acceleration</span>
+                        <select x-model="hwAccel" class="w-full bg-gray-700 rounded px-3 py-2">
+                            <option value="vaapi">Intel GPU (VAAPI)</option>
+                            <option value="nvidia">NVIDIA GPU</option>
+                            <option value="cpu">CPU Only</option>
+                        </select>
+                    </label>
+
+                    <label class="block mb-4">
+                        <span class="text-gray-300 block mb-2">Detector Type</span>
+                        <select x-model="detector" class="w-full bg-gray-700 rounded px-3 py-2">
+                            <option value="openvino">OpenVINO (Intel GPU - Recommended)</option>
+                            <option value="cpu">CPU Detector</option>
+                            <option value="tensorrt">TensorRT (NVIDIA)</option>
+                        </select>
+                    </label>
+
+                    <label class="block mb-4" x-show="detector === 'openvino' || detector === 'cpu'">
+                        <span class="text-gray-300 block mb-2">Detection Model</span>
+                        <select x-model="detectionModel" class="w-full bg-gray-700 rounded px-3 py-2">
+                            <option value="ssdlite_mobilenet_v2">SSDLite MobileNet v2 (Default, included)</option>
+                            <option value="yolov8n">YOLOv8 Nano (Download required)</option>
+                            <option value="yolov9c">YOLOv9 Compact (Download required)</option>
+                            <option value="yolov11n">YOLOv11 Nano (Download required)</option>
+                            <option value="yolox_tiny">YOLOX Tiny (Download required)</option>
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1" x-show="detectionModel !== 'ssdlite_mobilenet_v2'">
+                            ⚠️ Requires manual download - see Documentation tab → Detection Models
+                        </p>
+                    </label>
+
+                    <label class="block mb-4">
+                        <span class="text-gray-300 block mb-2">Server IP Address</span>
+                        <input type="text" x-model="hostIP" placeholder="192.168.1.100" class="w-full bg-gray-700 rounded px-3 py-2">
+                        <p class="text-xs text-gray-400 mt-1">Your server's LAN IP (find with: <code>hostname -I</code>)</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-300 block mb-2">Frigate Web UI Port</span>
+                        <input type="text" x-model="frigatePort" placeholder="8971" class="w-full bg-gray-700 rounded px-3 py-2">
+                    </label>
+                </div>
+
+                <!-- Storage Settings -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">Storage Settings</h2>
+                    
+                    <label class="block mb-4">
+                        <span class="text-gray-300 block mb-2">Storage Path (on host)</span>
+                        <input type="text" x-model="storagePath" placeholder="/mnt/frigate" class="w-full bg-gray-700 rounded px-3 py-2">
+                        <p class="text-xs text-gray-400 mt-1">Where recordings/clips will be saved</p>
+                    </label>
+
+                    <label class="block mb-4">
+                        <span class="text-gray-300 block mb-2">Recording Retention (days)</span>
+                        <input type="number" x-model="retentionDays" placeholder="7" class="w-full bg-gray-700 rounded px-3 py-2">
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-300 block mb-2">Event Retention (days)</span>
+                        <input type="number" x-model="eventRetention" placeholder="30" class="w-full bg-gray-700 rounded px-3 py-2">
+                        <p class="text-xs text-gray-400 mt-1">Events with detected objects</p>
+                    </label>
+                </div>
+
+                <!-- MQTT Settings -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">MQTT Settings</h2>
+                    
+                    <label class="block mb-4">
+                        <input type="checkbox" x-model="mqttEnabled" class="mr-2">
+                        <span class="text-gray-300">Enable MQTT (for Home Assistant integration)</span>
+                    </label>
+
+                    <template x-if="mqttEnabled">
+                        <div class="space-y-4">
+                            <label class="block">
+                                <span class="text-gray-300 block mb-2">MQTT Broker IP Address</span>
+                                <input type="text" x-model="mqttHost" placeholder="192.168.1.50" class="w-full bg-gray-700 rounded px-3 py-2">
+                            </label>
+                            <label class="block">
+                                <span class="text-gray-300 block mb-2">MQTT Port</span>
+                                <input type="text" x-model="mqttPort" placeholder="1883" class="w-full bg-gray-700 rounded px-3 py-2">
+                            </label>
+                            <label class="block">
+                                <span class="text-gray-300 block mb-2">MQTT Username</span>
+                                <input type="text" x-model="mqttUser" placeholder="frigate" class="w-full bg-gray-700 rounded px-3 py-2">
+                            </label>
+                            <label class="block">
+                                <span class="text-gray-300 block mb-2">MQTT Password</span>
+                                <input type="password" x-model="mqttPass" placeholder="password" class="w-full bg-gray-700 rounded px-3 py-2">
+                            </label>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Cameras -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">Cameras</h2>
+                    
+                    <template x-for="(camera, index) in cameras" :key="index">
+                        <div class="bg-gray-700 rounded p-4 mb-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold">Camera <span x-text="index + 1"></span></h3>
+                                <button @click="cameras.splice(index, 1)" class="text-red-500 hover:text-red-400">❌ Remove</button>
+                            </div>
+                            
+                            <label class="block mb-3">
+                                <span class="text-gray-300 block mb-2">Camera Name</span>
+                                <input type="text" x-model="camera.name" placeholder="e.g., front_door" class="w-full bg-gray-600 rounded px-3 py-2">
+                                <p class="text-xs text-gray-400 mt-1">Use lowercase, underscores only (no spaces/dashes)</p>
+                            </label>
+
+                            <!-- Main Stream -->
+                            <div class="bg-gray-600 rounded p-3 mb-3">
+                                <p class="font-bold text-sm mb-2">Main Stream (High Resolution - Recording)</p>
+                                <label class="block mb-2">
+                                    <span class="text-gray-300 text-sm block mb-1">RTSP URL</span>
+                                    <input type="text" x-model="camera.mainStream" placeholder="rtsp://admin:password@192.168.1.64/stream1" class="w-full bg-gray-700 rounded px-3 py-2 text-sm">
+                                </label>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <label class="block">
+                                        <span class="text-gray-300 text-xs block mb-1">Width (px)</span>
+                                        <input type="number" x-model="camera.mainWidth" placeholder="1920" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                    </label>
+                                    <label class="block">
+                                        <span class="text-gray-300 text-xs block mb-1">Height (px)</span>
+                                        <input type="number" x-model="camera.mainHeight" placeholder="1080" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                    </label>
+                                </div>
+                                <label class="block mb-2">
+                                    <span class="text-gray-300 text-xs block mb-1">Bitrate (kbps)</span>
+                                    <input type="number" x-model="camera.mainBitrate" placeholder="4096" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                </label>
+                                <label class="block">
+                                    <span class="text-gray-300 text-xs block mb-1">Encoding</span>
+                                    <select x-model="camera.mainEncoding" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                        <option value="cbr">CBR (Constant Bitrate - Recommended)</option>
+                                        <option value="vbr">VBR (Variable Bitrate)</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <!-- Sub Stream -->
+                            <div class="bg-gray-600 rounded p-3">
+                                <p class="font-bold text-sm mb-2">Sub Stream (Low Resolution - Detection)</p>
+                                <label class="block mb-2">
+                                    <span class="text-gray-300 text-sm block mb-1">RTSP URL</span>
+                                    <input type="text" x-model="camera.subStream" placeholder="rtsp://admin:password@192.168.1.64/stream2" class="w-full bg-gray-700 rounded px-3 py-2 text-sm">
+                                </label>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <label class="block">
+                                        <span class="text-gray-300 text-xs block mb-1">Width (px)</span>
+                                        <input type="number" x-model="camera.subWidth" placeholder="1280" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                    </label>
+                                    <label class="block">
+                                        <span class="text-gray-300 text-xs block mb-1">Height (px)</span>
+                                        <input type="number" x-model="camera.subHeight" placeholder="720" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                    </label>
+                                </div>
+                                <label class="block mb-2">
+                                    <span class="text-gray-300 text-xs block mb-1">Bitrate (kbps)</span>
+                                    <input type="number" x-model="camera.subBitrate" placeholder="1024" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                </label>
+                                <label class="block">
+                                    <span class="text-gray-300 text-xs block mb-1">Encoding</span>
+                                    <select x-model="camera.subEncoding" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                        <option value="cbr">CBR (Constant Bitrate - Recommended)</option>
+                                        <option value="vbr">VBR (Variable Bitrate)</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    </template>
+
+                    <button @click="cameras.push({name: '', mainStream: '', subStream: '', mainWidth: 1920, mainHeight: 1080, subWidth: 1280, subHeight: 720, mainBitrate: 4096, subBitrate: 1024, mainEncoding: 'cbr', subEncoding: 'cbr'})" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 rounded px-4 py-2 font-semibold">
+                        + Add Camera
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Right Panel: Generated Config -->
+            <div class="space-y-6 lg:sticky lg:top-4 lg:self-start">
+                
+                <!-- Docker Compose -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">docker-compose.yml</h2>
+                        <button @click="copyToClipboard('compose')" class="bg-green-600 hover:bg-green-700 rounded px-4 py-2 text-sm font-semibold">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <pre class="bg-gray-900 rounded p-4 overflow-x-auto text-sm max-h-96"><code class="language-yaml" x-text="generateDockerCompose()"></code></pre>
+                </div>
+
+                <!-- Config YAML -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">config/config.yml</h2>
+                        <button @click="copyToClipboard('config')" class="bg-green-600 hover:bg-green-700 rounded px-4 py-2 text-sm font-semibold">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <pre class="bg-gray-900 rounded p-4 overflow-x-auto text-sm max-h-96"><code class="language-yaml" x-text="generateConfig()"></code></pre>
+                </div>
+
+                <!-- Storage Calculator -->
+                <div class="bg-yellow-900 bg-opacity-30 border border-yellow-600 rounded-lg p-4">
+                    <h3 class="font-bold text-yellow-400 mb-2">📊 Storage Calculator</h3>
+                    <p class="text-sm text-gray-300" x-text="calculateStorage()"></p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Documentation Tab -->
+        <div x-show="activeTab === 'docs'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
+            <h2 class="text-3xl font-bold mb-6">📖 Complete Documentation</h2>
+
+            <div class="space-y-8">
+                
+                <section class="bg-red-900 bg-opacity-30 border border-red-600 rounded p-4">
+                    <h3 class="text-2xl font-bold mb-3 text-red-400">🔐 CRITICAL: Getting Your Frigate Password</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>On first startup, Frigate generates a random admin password.</strong> Get it from logs:</p>
+                        <pre class="bg-gray-900 rounded p-3 mt-2"><code>docker logs frigate 2>&1 | grep -i password</code></pre>
+                        <p><strong>If you lost it, reset the password:</strong></p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Edit <code>config/config.yml</code> and add at the TOP:</li>
+                        </ol>
+                        <pre class="bg-gray-900 rounded p-3 mt-2"><code>auth:
+  reset_admin_password: true</code></pre>
+                        <ol start="2" class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Restart: <code>docker restart frigate</code></li>
+                            <li>Check logs: <code>docker logs frigate | grep password</code></li>
+                            <li><strong>REMOVE</strong> that line from config after getting new password</li>
+                            <li>Change password in UI: Settings → Users</li>
+                        </ol>
+                        <p class="mt-3"><strong>Username is always:</strong> <code class="text-green-400">admin</code></p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🎯 Detection Models Guide</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>Default model (included):</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>SSDLite MobileNet v2</strong> - 300×300 - Balanced speed/accuracy, no setup needed</li>
+                        </ul>
+
+                        <p class="mt-4"><strong>Additional models (require download):</strong></p>
+                        
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">YOLOv8 Nano (Recommended upgrade)</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Download model:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>mkdir -p /opt/frigate/config/model_cache
+cd /opt/frigate/config/model_cache
+# Download YOLOv8n ONNX from Ultralytics
+wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx</code></pre>
+                                </li>
+                                <li>Update config.yml:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>model:
+  path: /config/model_cache/yolov8n.onnx
+  input_tensor: nchw
+  input_pixel_format: bgr
+  width: 640
+  height: 640</code></pre>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">YOLOv9 Compact (Better accuracy)</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Download from official YOLOv9 repo</li>
+                                <li>Convert to ONNX format</li>
+                                <li>Place in <code>/opt/frigate/config/model_cache/</code></li>
+                                <li>Update config with path and 640×640 input size</li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">YOLOv11 Nano (Latest model)</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Download from Ultralytics: <code>yolov11n.onnx</code></li>
+                                <li>Place in model cache directory</li>
+                                <li>Configure 640×640 input size in config.yml</li>
+                            </ol>
+                        </div>
+
+                        <p class="mt-4 text-yellow-300"><strong>⚠️ Important:</strong></p>
+                        <ul class="list-disc list-inside ml-4 text-sm">
+                            <li>Larger models = better accuracy but slower detection</li>
+                            <li>Default SSDLite MobileNet v2 is excellent for most use cases</li>
+                            <li>Test new models before deploying to production</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🎥 Finding Camera RTSP URLs</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>Common RTSP URL formats by brand:</strong></p>
+                        <div class="bg-gray-900 rounded p-3 space-y-2 text-sm">
+                            <p><strong class="text-blue-400">Hikvision:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/Streaming/Channels/101</code> (main)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102</code> (sub)
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Dahua / Loryta:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=0</code> (main)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=1</code> (sub)
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Reolink:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/h264Preview_01_main</code> (main)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/h264Preview_01_sub</code> (sub)
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Generic:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/stream1</code>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">⚙️ Hardware Acceleration Setup</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <div class="bg-blue-900 bg-opacity-30 border border-blue-600 rounded p-4">
+                            <p class="font-bold text-blue-400 mb-2">Intel GPU (VAAPI) - Recommended</p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code>sudo usermod -aG render,video $(whoami)
+sudo chmod -R 777 /dev/dri
+# Logout and login</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">📦 Deployment Steps</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <pre class="bg-gray-900 rounded p-3"><code>mkdir -p /opt/frigate/config
+cd /opt/frigate
+# Paste docker-compose.yml
+nano docker-compose.yml
+# Paste config.yml
+nano config/config.yml
+docker compose up -d
+docker logs frigate | grep password</code></pre>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Architecture Tab -->
+        <div x-show="activeTab === 'architecture'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
+            <h2 class="text-3xl font-bold mb-6">🏗️ How Frigate Works</h2>
+            <div class="space-y-6 text-gray-300">
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">Architecture Overview</h3>
+                    <pre class="bg-gray-900 rounded p-4 text-xs">Camera RTSP Streams
+        ↓
+    go2rtc (Restreaming)
+        ↓
+    FFmpeg (Decoding)
+        ↓
+    ┌───────┴───────┐
+    ↓               ↓
+Detection       Recording
+(Sub stream)    (Main stream)
+    ↓               ↓
+Detector GPU    Disk Storage
+    ↓
+Object Tracking
+    ↓
+Events & MQTT</pre>
+                    <p class="mt-4"><strong>go2rtc:</strong> Converts RTSP to WebRTC/MSE for low-latency browser viewing</p>
+                    <p><strong>Detection:</strong> Motion triggers GPU inference → Objects tracked → Events created</p>
+                    <p><strong>Recording:</strong> Continuous or motion-based recording to disk</p>
+                </section>
+            </div>
+        </div>
+
+        <!-- Scripts Tab -->
+        <div x-show="activeTab === 'scripts'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
+            <h2 class="text-3xl font-bold mb-6">💻 Useful Scripts</h2>
+            <div class="space-y-6">
+                <section>
+                    <h3 class="text-xl font-bold mb-2">Get Admin Password</h3>
+                    <pre class="bg-gray-900 rounded p-3"><code>docker logs frigate 2>&1 | grep -i password</code></pre>
+                </section>
+                <section>
+                    <h3 class="text-xl font-bold mb-2">Check for Errors</h3>
+                    <pre class="bg-gray-900 rounded p-3"><code>docker logs frigate 2>&1 | grep -i error</code></pre>
+                </section>
+                <section>
+                    <h3 class="text-xl font-bold mb-2">Verify go2rtc Streams</h3>
+                    <pre class="bg-gray-900 rounded p-3"><code>docker exec frigate curl -s http://127.0.0.1:1984/api/streams</code></pre>
+                </section>
+                <section>
+                    <h3 class="text-xl font-bold mb-2">Check GPU Access</h3>
+                    <pre class="bg-gray-900 rounded p-3"><code>docker exec frigate ls -la /dev/dri</code></pre>
+                </section>
+                <section>
+                    <h3 class="text-xl font-bold mb-2">Storage Usage</h3>
+                    <pre class="bg-gray-900 rounded p-3"><code>df -h /mnt/frigate
+du -sh /mnt/frigate/recordings/*</code></pre>
+                </section>
+            </div>
+        </div>
+
+        <!-- Advanced Tips Tab -->
+        <div x-show="activeTab === 'advanced'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
+            <h2 class="text-3xl font-bold mb-6">🚀 Pro Tips & Tricks</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li><strong>Smart zones:</strong> Only trigger alerts in specific areas of the frame</li>
+                <li><strong>Home Assistant:</strong> Auto-discovered via MQTT for seamless integration</li>
+                <li><strong>Remote access:</strong> Use Tailscale VPN (never directly port-forward Frigate!)</li>
+                <li><strong>CBR encoding:</strong> Set cameras to constant bitrate for stable streams</li>
+                <li><strong>Lower detection FPS:</strong> 5fps is plenty, saves GPU resources</li>
+                <li><strong>Use sub streams:</strong> 720p for detection, 1080p/4K for recording</li>
+                <li><strong>Storage optimization:</strong> SSD for clips/database, HDD for recordings</li>
+                <li><strong>Regular backups:</strong> Config + database weekly, recordings optional</li>
+                <li><strong>Frigate+:</strong> Subscribe for cloud features and support development</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <footer class="text-center text-gray-500 text-sm py-8">
+        <p>Frigate Configuration Generator v1.0 | Not affiliated with Frigate NVR</p>
+        <p class="mt-2">Made with ❤️ for the Frigate community</p>
+        <p class="mt-2">Special thanks to Blake Blackshear and all Frigate contributors for their incredible work!</p>
+    </footer>
+
+    <script>
+        function frigateConfig() {
+            return {
+                activeTab: 'config',
+                hwAccel: 'vaapi',
+                detector: 'openvino',
+                detectionModel: 'ssdlite_mobilenet_v2',
+                hostIP: '192.168.1.100',
+                frigatePort: '8971',
+                storagePath: '/mnt/frigate',
+                retentionDays: 7,
+                eventRetention: 30,
+                mqttEnabled: true,
+                mqttHost: '192.168.1.50',
+                mqttPort: '1883',
+                mqttUser: 'frigate',
+                mqttPass: 'password',
+                cameras: [
+                    {
+                        name: 'front_door',
+                        mainStream: 'rtsp://admin:password@192.168.1.64/stream1',
+                        subStream: 'rtsp://admin:password@192.168.1.64/stream2',
+                        mainWidth: 1920,
+                        mainHeight: 1080,
+                        subWidth: 1280,
+                        subHeight: 720,
+                        mainBitrate: 4096,
+                        subBitrate: 1024,
+                        mainEncoding: 'cbr',
+                        subEncoding: 'cbr'
+                    }
+                ],
+
+                generateDockerCompose() {
+                    let compose = `version: "3.9"
+services:
+  frigate:
+    container_name: frigate
+    privileged: true
+    restart: unless-stopped
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "256mb"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config:/config
+      - ${this.storagePath}:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 2000000000
+    ports:
+      - "${this.frigatePort}:8971"
+      - "8554:8554"
+      - "8555:8555/tcp"
+      - "8555:8555/udp"
+    environment:
+      - FRIGATE_RTSP_PASSWORD=password`;
+
+                    if (this.hwAccel === 'vaapi') {
+                        compose += `
+    devices:
+      - /dev/dri:/dev/dri`;
+                    } else if (this.hwAccel === 'nvidia') {
+                        compose += `
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]`;
+                    }
+
+                    return compose;
+                },
+
+                generateConfig() {
+                    let config = '';
+
+                    // MQTT
+                    if (this.mqttEnabled) {
+                        config += `mqtt:
+  enabled: true
+  host: ${this.mqttHost}
+  port: ${this.mqttPort}
+  topic_prefix: frigate
+  client_id: frigate
+  user: ${this.mqttUser}
+  password: ${this.mqttPass}
+  stats_interval: 60
+
+`;
+                    }
+
+                    // FFmpeg
+                    config += `ffmpeg:
+  hwaccel_args: preset-${this.hwAccel}
+
+`;
+
+                    // Detectors
+                    config += `detectors:
+  ${this.detector}:
+    type: ${this.detector}`;
+                    
+                    if (this.detector === 'openvino') {
+                        config += `
+    device: GPU`;
+                    }
+                    
+                    config += `
+
+`;
+
+                    // Model
+                    if (this.detector === 'openvino' || this.detector === 'cpu') {
+                        const modelConfigs = {
+                            'ssdlite_mobilenet_v2': {
+                                width: 300,
+                                height: 300,
+                                tensor: 'nhwc',
+                                pixel: 'bgr',
+                                path: '/openvino-model/ssdlite_mobilenet_v2.xml',
+                                labelmap: '/openvino-model/coco_91cl_bkgr.txt'
+                            },
+                            'yolov8n': {
+                                width: 640,
+                                height: 640,
+                                tensor: 'nchw',
+                                pixel: 'bgr',
+                                path: '/config/model_cache/yolov8n.onnx',
+                                labelmap: '/openvino-model/coco_80cl.txt'
+                            },
+                            'yolov9c': {
+                                width: 640,
+                                height: 640,
+                                tensor: 'nchw',
+                                pixel: 'bgr',
+                                path: '/config/model_cache/yolov9c.onnx',
+                                labelmap: '/openvino-model/coco_80cl.txt'
+                            },
+                            'yolov11n': {
+                                width: 640,
+                                height: 640,
+                                tensor: 'nchw',
+                                pixel: 'bgr',
+                                path: '/config/model_cache/yolov11n.onnx',
+                                labelmap: '/openvino-model/coco_80cl.txt'
+                            },
+                            'yolox_tiny': {
+                                width: 416,
+                                height: 416,
+                                tensor: 'nchw',
+                                pixel: 'bgr',
+                                path: '/config/model_cache/yolox-tiny.xml',
+                                labelmap: '/openvino-model/coco_80cl.txt'
+                            }
+                        };
+
+                        const modelConfig = modelConfigs[this.detectionModel];
+                        config += `model:
+  width: ${modelConfig.width}
+  height: ${modelConfig.height}
+  input_tensor: ${modelConfig.tensor}
+  input_pixel_format: ${modelConfig.pixel}
+  path: ${modelConfig.path}
+  labelmap_path: ${modelConfig.labelmap}
+
+`;
+                    }
+
+                    // go2rtc
+                    config += `go2rtc:
+  streams:
+`;
+                    this.cameras.forEach(cam => {
+                        if (cam.name && cam.mainStream) {
+                            config += `    ${cam.name}: ${cam.mainStream}
+`;
+                        }
+                    });
+                    config += `  webrtc:
+    listen: ":8555"
+
+`;
+
+                    // Cameras
+                    config += `cameras:
+`;
+                    this.cameras.forEach(cam => {
+                        if (cam.name && cam.mainStream) {
+                            config += `  ${cam.name}:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: ${cam.subStream || cam.mainStream}
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+        - path: ${cam.mainStream}
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+    detect:
+      enabled: true
+      width: ${cam.subWidth || 1280}
+      height: ${cam.subHeight || 720}
+      fps: 5
+    objects:
+      track:
+        - person
+        - car
+        - dog
+        - cat
+      filters:
+        person:
+          min_area: 2000
+          threshold: 0.7
+        car:
+          min_area: 8000
+          threshold: 0.7
+    record:
+      enabled: true
+      retain:
+        days: ${this.retentionDays}
+        mode: motion
+      events:
+        retain:
+          default: ${this.eventRetention}
+          objects:
+            person: ${this.eventRetention}
+    snapshots:
+      enabled: true
+      timestamp: false
+      bounding_box: true
+      retain:
+        default: ${this.eventRetention}
+
+`;
+                        }
+                    });
+
+                    return config;
+                },
+
+                calculateStorage() {
+                    let totalMbps = 0;
+                    this.cameras.forEach(cam => {
+                        totalMbps += (cam.mainBitrate || 4096) / 1000;
+                    });
+                    
+                    const gbPerDay = totalMbps * 24 * 0.45;
+                    const totalGb = gbPerDay * this.retentionDays;
+                    const totalTb = (totalGb / 1000).toFixed(2);
+                    
+                    return `${this.cameras.length} camera(s) × ${this.retentionDays} days retention = ~${totalTb} TB required. Recommendation: ${Math.ceil(totalTb * 1.5)} TB drive.`;
+                },
+
+                copyToClipboard(type) {
+                    const text = type === 'compose' ? this.generateDockerCompose() : this.generateConfig();
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('✅ Copied to clipboard!');
+                    }).catch(() => {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        alert('✅ Copied to clipboard!');
+                    });
+                }
+            }
+        }
+
+        document.addEventListener('alpine:initialized', () => {
+            setInterval(() => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
