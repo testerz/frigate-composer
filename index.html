@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frigate NVR Configuration Generator</title>
+    <title>Frigate NVR Configuration Generator - Professional Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
@@ -24,16 +24,17 @@
         <!-- Frigate Appreciation Banner -->
         <div class="bg-gradient-to-r from-blue-900 to-purple-900 border border-blue-500 rounded-lg p-6 mb-6">
             <h3 class="text-xl font-bold mb-2">💙 Support the Frigate Team</h3>
-            <p class="text-gray-300 mb-3">Frigate is a free, open-source project built by dedicated developers. If you find it valuable, please consider:</p>
+            <p class="text-gray-300 mb-3">Frigate is a free, open-source project built by <strong>Blake Blackshear</strong> and dedicated contributors who work tirelessly to provide the best NVR solution. Their incredible effort makes this software possible for everyone.</p>
+            <p class="text-gray-300 mb-3">If Frigate has helped you secure your home or business, please consider supporting the project:</p>
             <div class="flex flex-wrap gap-4">
-                <a href="https://frigate.video/plus" target="_blank" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded font-semibold inline-flex items-center">
-                    ⭐ Subscribe to Frigate+ (Cloud features)
+                <a href="https://frigate.video/plus" target="_blank" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-semibold inline-flex items-center transition">
+                    ⭐ Subscribe to Frigate+ (Cloud AI, model training)
                 </a>
-                <a href="https://github.com/sponsors/blakeblackshear" target="_blank" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded font-semibold inline-flex items-center">
-                    ❤️ Donate to the Project
+                <a href="https://github.com/sponsors/blakeblackshear" target="_blank" class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded font-semibold inline-flex items-center transition">
+                    ❤️ Donate via GitHub Sponsors
                 </a>
             </div>
-            <p class="text-xs text-gray-400 mt-3">Your support helps maintain and improve Frigate for everyone!</p>
+            <p class="text-xs text-gray-400 mt-3">Your support helps maintain development, add new features, and keep Frigate free for everyone. Thank you! 🙏</p>
         </div>
 
         <!-- Tab Navigation -->
@@ -46,13 +47,13 @@
                     class="px-4 py-2 font-semibold">📖 Documentation</button>
             <button @click="activeTab = 'architecture'" 
                     :class="activeTab === 'architecture' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
-                    class="px-4 py-2 font-semibold">🏗️ How It Works</button>
+                    class="px-4 py-2 font-semibold">🏗️ How Frigate Works</button>
             <button @click="activeTab = 'scripts'" 
                     :class="activeTab === 'scripts' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
-                    class="px-4 py-2 font-semibold">💻 Scripts</button>
+                    class="px-4 py-2 font-semibold">💻 Useful Scripts</button>
             <button @click="activeTab = 'advanced'" 
                     :class="activeTab === 'advanced' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'"
-                    class="px-4 py-2 font-semibold">🚀 Pro Tips</button>
+                    class="px-4 py-2 font-semibold">🚀 Advanced Tips</button>
         </div>
 
         <!-- Configuration Tab -->
@@ -78,9 +79,14 @@
                         <span class="text-gray-300 block mb-2">Detector Type</span>
                         <select x-model="detector" class="w-full bg-gray-700 rounded px-3 py-2">
                             <option value="openvino">OpenVINO (Intel GPU - Recommended)</option>
+                            <option value="edgetpu">Google Coral Edge TPU (USB/M.2/PCIe)</option>
                             <option value="cpu">CPU Detector</option>
-                            <option value="tensorrt">TensorRT (NVIDIA)</option>
+                            <option value="tensorrt">TensorRT (NVIDIA GPU)</option>
+                            <option value="rocm">ROCm (AMD GPU)</option>
                         </select>
+                        <p class="text-xs text-gray-400 mt-1" x-show="detector === 'edgetpu'">
+                            🪸 Coral TPU: Best performance/watt, requires USB or PCIe Coral device
+                        </p>
                     </label>
 
                     <label class="block mb-4" x-show="detector === 'openvino' || detector === 'cpu'">
@@ -89,23 +95,33 @@
                             <option value="ssdlite_mobilenet_v2">SSDLite MobileNet v2 (Default, included)</option>
                             <option value="yolov8n">YOLOv8 Nano (Download required)</option>
                             <option value="yolov9c">YOLOv9 Compact (Download required)</option>
+                            <option value="yolov10n">YOLOv10 Nano (Download required)</option>
                             <option value="yolov11n">YOLOv11 Nano (Download required)</option>
                             <option value="yolox_tiny">YOLOX Tiny (Download required)</option>
                         </select>
                         <p class="text-xs text-gray-400 mt-1" x-show="detectionModel !== 'ssdlite_mobilenet_v2'">
-                            ⚠️ Requires manual download - see Documentation tab → Detection Models
+                            ⚠️ Requires manual download - see Documentation tab → Detection Models Guide
                         </p>
+                    </label>
+
+                    <label class="block mb-4" x-show="detector === 'edgetpu'">
+                        <span class="text-gray-300 block mb-2">Coral TPU Device Type</span>
+                        <select x-model="coralDevice" class="w-full bg-gray-700 rounded px-3 py-2">
+                            <option value="usb">USB Coral (Plug & Play)</option>
+                            <option value="pcie">PCIe/M.2 Coral (Faster)</option>
+                        </select>
                     </label>
 
                     <label class="block mb-4">
                         <span class="text-gray-300 block mb-2">Server IP Address</span>
                         <input type="text" x-model="hostIP" placeholder="192.168.1.100" class="w-full bg-gray-700 rounded px-3 py-2">
-                        <p class="text-xs text-gray-400 mt-1">Your server's LAN IP (find with: <code>hostname -I</code>)</p>
+                        <p class="text-xs text-gray-400 mt-1">Your server's LAN IP address (find with: <code>hostname -I</code>)</p>
                     </label>
 
                     <label class="block">
                         <span class="text-gray-300 block mb-2">Frigate Web UI Port</span>
                         <input type="text" x-model="frigatePort" placeholder="8971" class="w-full bg-gray-700 rounded px-3 py-2">
+                        <p class="text-xs text-gray-400 mt-1">Default: 8971 (change if port conflict)</p>
                     </label>
                 </div>
 
@@ -114,20 +130,21 @@
                     <h2 class="text-2xl font-bold mb-4">Storage Settings</h2>
                     
                     <label class="block mb-4">
-                        <span class="text-gray-300 block mb-2">Storage Path (on host)</span>
+                        <span class="text-gray-300 block mb-2">Storage Path (on host machine)</span>
                         <input type="text" x-model="storagePath" placeholder="/mnt/frigate" class="w-full bg-gray-700 rounded px-3 py-2">
-                        <p class="text-xs text-gray-400 mt-1">Where recordings/clips will be saved</p>
+                        <p class="text-xs text-gray-400 mt-1">Full path where recordings, clips, and snapshots will be saved</p>
                     </label>
 
                     <label class="block mb-4">
-                        <span class="text-gray-300 block mb-2">Recording Retention (days)</span>
+                        <span class="text-gray-300 block mb-2">Recording Retention Period (days)</span>
                         <input type="number" x-model="retentionDays" placeholder="7" class="w-full bg-gray-700 rounded px-3 py-2">
+                        <p class="text-xs text-gray-400 mt-1">How long to keep continuous recordings</p>
                     </label>
 
                     <label class="block">
-                        <span class="text-gray-300 block mb-2">Event Retention (days)</span>
+                        <span class="text-gray-300 block mb-2">Event Retention Period (days)</span>
                         <input type="number" x-model="eventRetention" placeholder="30" class="w-full bg-gray-700 rounded px-3 py-2">
-                        <p class="text-xs text-gray-400 mt-1">Events with detected objects</p>
+                        <p class="text-xs text-gray-400 mt-1">How long to keep recordings with detected objects (person, car, etc.)</p>
                     </label>
                 </div>
 
@@ -137,7 +154,7 @@
                     
                     <label class="block mb-4">
                         <input type="checkbox" x-model="mqttEnabled" class="mr-2">
-                        <span class="text-gray-300">Enable MQTT (for Home Assistant integration)</span>
+                        <span class="text-gray-300">Enable MQTT (required for Home Assistant integration)</span>
                     </label>
 
                     <template x-if="mqttEnabled">
@@ -145,18 +162,22 @@
                             <label class="block">
                                 <span class="text-gray-300 block mb-2">MQTT Broker IP Address</span>
                                 <input type="text" x-model="mqttHost" placeholder="192.168.1.50" class="w-full bg-gray-700 rounded px-3 py-2">
+                                <p class="text-xs text-gray-400 mt-1">IP address of your MQTT broker (e.g., Mosquitto, Home Assistant)</p>
                             </label>
                             <label class="block">
-                                <span class="text-gray-300 block mb-2">MQTT Port</span>
+                                <span class="text-gray-300 block mb-2">MQTT Port Number</span>
                                 <input type="text" x-model="mqttPort" placeholder="1883" class="w-full bg-gray-700 rounded px-3 py-2">
+                                <p class="text-xs text-gray-400 mt-1">Default MQTT port is 1883 (8883 for SSL)</p>
                             </label>
                             <label class="block">
                                 <span class="text-gray-300 block mb-2">MQTT Username</span>
                                 <input type="text" x-model="mqttUser" placeholder="frigate" class="w-full bg-gray-700 rounded px-3 py-2">
+                                <p class="text-xs text-gray-400 mt-1">Username for MQTT authentication</p>
                             </label>
                             <label class="block">
                                 <span class="text-gray-300 block mb-2">MQTT Password</span>
                                 <input type="password" x-model="mqttPass" placeholder="password" class="w-full bg-gray-700 rounded px-3 py-2">
+                                <p class="text-xs text-gray-400 mt-1">Password for MQTT authentication</p>
                             </label>
                         </div>
                     </template>
@@ -164,85 +185,91 @@
 
                 <!-- Cameras -->
                 <div class="bg-gray-800 rounded-lg p-6">
-                    <h2 class="text-2xl font-bold mb-4">Cameras</h2>
+                    <h2 class="text-2xl font-bold mb-4">Cameras Configuration</h2>
                     
                     <template x-for="(camera, index) in cameras" :key="index">
                         <div class="bg-gray-700 rounded p-4 mb-4">
                             <div class="flex justify-between items-center mb-3">
-                                <h3 class="font-bold">Camera <span x-text="index + 1"></span></h3>
-                                <button @click="cameras.splice(index, 1)" class="text-red-500 hover:text-red-400">❌ Remove</button>
+                                <h3 class="font-bold text-lg">Camera <span x-text="index + 1"></span></h3>
+                                <button @click="cameras.splice(index, 1)" class="text-red-500 hover:text-red-400 font-semibold">❌ Remove</button>
                             </div>
                             
-                            <label class="block mb-3">
-                                <span class="text-gray-300 block mb-2">Camera Name</span>
-                                <input type="text" x-model="camera.name" placeholder="e.g., front_door" class="w-full bg-gray-600 rounded px-3 py-2">
-                                <p class="text-xs text-gray-400 mt-1">Use lowercase, underscores only (no spaces/dashes)</p>
+                            <label class="block mb-4">
+                                <span class="text-gray-300 block mb-2 font-semibold">Camera Name</span>
+                                <input type="text" x-model="camera.name" placeholder="e.g., front_door or backyard" class="w-full bg-gray-600 rounded px-3 py-2">
+                                <p class="text-xs text-gray-400 mt-1">Use lowercase letters and underscores only (no spaces, dashes, or special characters)</p>
                             </label>
 
                             <!-- Main Stream -->
-                            <div class="bg-gray-600 rounded p-3 mb-3">
-                                <p class="font-bold text-sm mb-2">Main Stream (High Resolution - Recording)</p>
-                                <label class="block mb-2">
-                                    <span class="text-gray-300 text-sm block mb-1">RTSP URL</span>
-                                    <input type="text" x-model="camera.mainStream" placeholder="rtsp://admin:password@192.168.1.64/stream1" class="w-full bg-gray-700 rounded px-3 py-2 text-sm">
+                            <div class="bg-gray-600 rounded p-4 mb-4">
+                                <p class="font-bold text-sm mb-3 text-green-400">📹 Main Stream (High Resolution - For Recording)</p>
+                                <label class="block mb-3">
+                                    <span class="text-gray-300 text-sm block mb-1 font-semibold">RTSP URL</span>
+                                    <input type="text" x-model="camera.mainStream" placeholder="rtsp://admin:password@192.168.1.64:554/stream1" class="w-full bg-gray-700 rounded px-3 py-2 text-sm">
+                                    <p class="text-xs text-gray-400 mt-1">Full RTSP URL including username, password, IP, and stream path</p>
                                 </label>
-                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div class="grid grid-cols-2 gap-3 mb-3">
                                     <label class="block">
-                                        <span class="text-gray-300 text-xs block mb-1">Width (px)</span>
+                                        <span class="text-gray-300 text-xs block mb-1">Width (pixels)</span>
                                         <input type="number" x-model="camera.mainWidth" placeholder="1920" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
                                     </label>
                                     <label class="block">
-                                        <span class="text-gray-300 text-xs block mb-1">Height (px)</span>
+                                        <span class="text-gray-300 text-xs block mb-1">Height (pixels)</span>
                                         <input type="number" x-model="camera.mainHeight" placeholder="1080" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
                                     </label>
                                 </div>
-                                <label class="block mb-2">
+                                <label class="block mb-3">
                                     <span class="text-gray-300 text-xs block mb-1">Bitrate (kbps)</span>
                                     <input type="number" x-model="camera.mainBitrate" placeholder="4096" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                    <p class="text-xs text-gray-400 mt-1">Recommended: 4096-6144 for 1080p, 8192-12288 for 4K</p>
                                 </label>
                                 <label class="block">
-                                    <span class="text-gray-300 text-xs block mb-1">Encoding</span>
+                                    <span class="text-gray-300 text-xs block mb-1">Stream Encoding Mode</span>
                                     <select x-model="camera.mainEncoding" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
-                                        <option value="cbr">CBR (Constant Bitrate - Recommended)</option>
-                                        <option value="vbr">VBR (Variable Bitrate)</option>
+                                        <option value="cbr">CBR (Constant Bitrate - Recommended for Frigate)</option>
+                                        <option value="vbr">VBR (Variable Bitrate - Use only if bandwidth limited)</option>
                                     </select>
+                                    <p class="text-xs text-gray-400 mt-1">CBR provides stable stream quality, better for detection</p>
                                 </label>
                             </div>
 
                             <!-- Sub Stream -->
-                            <div class="bg-gray-600 rounded p-3">
-                                <p class="font-bold text-sm mb-2">Sub Stream (Low Resolution - Detection)</p>
-                                <label class="block mb-2">
-                                    <span class="text-gray-300 text-sm block mb-1">RTSP URL</span>
-                                    <input type="text" x-model="camera.subStream" placeholder="rtsp://admin:password@192.168.1.64/stream2" class="w-full bg-gray-700 rounded px-3 py-2 text-sm">
+                            <div class="bg-gray-600 rounded p-4">
+                                <p class="font-bold text-sm mb-3 text-blue-400">📹 Sub Stream (Low Resolution - For Detection)</p>
+                                <label class="block mb-3">
+                                    <span class="text-gray-300 text-sm block mb-1 font-semibold">RTSP URL</span>
+                                    <input type="text" x-model="camera.subStream" placeholder="rtsp://admin:password@192.168.1.64:554/stream2" class="w-full bg-gray-700 rounded px-3 py-2 text-sm">
+                                    <p class="text-xs text-gray-400 mt-1">Lower resolution stream for object detection (saves GPU/CPU)</p>
                                 </label>
-                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div class="grid grid-cols-2 gap-3 mb-3">
                                     <label class="block">
-                                        <span class="text-gray-300 text-xs block mb-1">Width (px)</span>
+                                        <span class="text-gray-300 text-xs block mb-1">Width (pixels)</span>
                                         <input type="number" x-model="camera.subWidth" placeholder="1280" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
                                     </label>
                                     <label class="block">
-                                        <span class="text-gray-300 text-xs block mb-1">Height (px)</span>
+                                        <span class="text-gray-300 text-xs block mb-1">Height (pixels)</span>
                                         <input type="number" x-model="camera.subHeight" placeholder="720" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
                                     </label>
                                 </div>
-                                <label class="block mb-2">
+                                <label class="block mb-3">
                                     <span class="text-gray-300 text-xs block mb-1">Bitrate (kbps)</span>
                                     <input type="number" x-model="camera.subBitrate" placeholder="1024" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
+                                    <p class="text-xs text-gray-400 mt-1">Recommended: 1024-2048 for 720p detection stream</p>
                                 </label>
                                 <label class="block">
-                                    <span class="text-gray-300 text-xs block mb-1">Encoding</span>
+                                    <span class="text-gray-300 text-xs block mb-1">Stream Encoding Mode</span>
                                     <select x-model="camera.subEncoding" class="w-full bg-gray-700 rounded px-2 py-1 text-sm">
-                                        <option value="cbr">CBR (Constant Bitrate - Recommended)</option>
+                                        <option value="cbr">CBR (Constant Bitrate - Recommended for Frigate)</option>
                                         <option value="vbr">VBR (Variable Bitrate)</option>
                                     </select>
+                                    <p class="text-xs text-gray-400 mt-1">CBR is strongly recommended for detection streams</p>
                                 </label>
                             </div>
                         </div>
                     </template>
 
                     <button @click="cameras.push({name: '', mainStream: '', subStream: '', mainWidth: 1920, mainHeight: 1080, subWidth: 1280, subHeight: 720, mainBitrate: 4096, subBitrate: 1024, mainEncoding: 'cbr', subEncoding: 'cbr'})" 
-                            class="w-full bg-blue-600 hover:bg-blue-700 rounded px-4 py-2 font-semibold">
+                            class="w-full bg-blue-600 hover:bg-blue-700 rounded px-4 py-3 font-semibold text-lg transition">
                         + Add Camera
                     </button>
                 </div>
@@ -256,8 +283,8 @@
                 <div class="bg-gray-800 rounded-lg p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">docker-compose.yml</h2>
-                        <button @click="copyToClipboard('compose')" class="bg-green-600 hover:bg-green-700 rounded px-4 py-2 text-sm font-semibold">
-                            📋 Copy
+                        <button @click="copyToClipboard('compose')" class="bg-green-600 hover:bg-green-700 rounded px-4 py-2 text-sm font-semibold transition">
+                            📋 Copy to Clipboard
                         </button>
                     </div>
                     <pre class="bg-gray-900 rounded p-4 overflow-x-auto text-sm max-h-96"><code class="language-yaml" x-text="generateDockerCompose()"></code></pre>
@@ -267,8 +294,8 @@
                 <div class="bg-gray-800 rounded-lg p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">config/config.yml</h2>
-                        <button @click="copyToClipboard('config')" class="bg-green-600 hover:bg-green-700 rounded px-4 py-2 text-sm font-semibold">
-                            📋 Copy
+                        <button @click="copyToClipboard('config')" class="bg-green-600 hover:bg-green-700 rounded px-4 py-2 text-sm font-semibold transition">
+                            📋 Copy to Clipboard
                         </button>
                     </div>
                     <pre class="bg-gray-900 rounded p-4 overflow-x-auto text-sm max-h-96"><code class="language-yaml" x-text="generateConfig()"></code></pre>
@@ -290,49 +317,427 @@
 
             <div class="space-y-8">
                 
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🚀 Quick Start Guide</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Fill in your system settings (hardware acceleration, detector type, server IP)</li>
+                        <li>Configure storage paths and retention periods based on your needs</li>
+                        <li>If using MQTT for Home Assistant integration, enable and configure broker details</li>
+                        <li>Add your cameras with RTSP URLs (see "Finding Camera RTSP URLs" below)</li>
+                        <li>For each camera, configure both main stream (recording) and sub stream (detection)</li>
+                        <li>Set appropriate bitrates and encoding (CBR recommended)</li>
+                        <li>Copy the generated <code>docker-compose.yml</code></li>
+                        <li>Copy the generated <code>config/config.yml</code></li>
+                        <li>Deploy on your server (see deployment steps below)</li>
+                        <li>Get your initial admin password from logs (CRITICAL - see below)</li>
+                    </ol>
+                </section>
+
                 <section class="bg-red-900 bg-opacity-30 border border-red-600 rounded p-4">
                     <h3 class="text-2xl font-bold mb-3 text-red-400">🔐 CRITICAL: Getting Your Frigate Password</h3>
                     <div class="space-y-3 text-gray-300">
-                        <p><strong>On first startup, Frigate generates a random admin password.</strong> Get it from logs:</p>
+                        <p><strong>On first startup, Frigate generates a random admin password.</strong> You MUST retrieve it from logs immediately:</p>
+                        
+                        <p class="mt-4"><strong>Method 1: View logs immediately after starting Frigate</strong></p>
                         <pre class="bg-gray-900 rounded p-3 mt-2"><code>docker logs frigate 2>&1 | grep -i password</code></pre>
-                        <p><strong>If you lost it, reset the password:</strong></p>
+                        <p>Look for a line like:<br><code class="text-green-400">Frigate admin user password: Xh9kL2mP5qR8tY</code></p>
+
+                        <p class="mt-4"><strong>Method 2: If you missed it, reset the password</strong></p>
                         <ol class="list-decimal list-inside ml-4 space-y-1">
-                            <li>Edit <code>config/config.yml</code> and add at the TOP:</li>
+                            <li>Edit your <code>config/config.yml</code></li>
+                            <li>Add this at the VERY TOP of the file (before any other configuration):</li>
                         </ol>
-                        <pre class="bg-gray-900 rounded p-3 mt-2"><code>auth:
+                        <pre class="bg-gray-900 rounded p-3 mt-2"><code class="language-yaml">auth:
   reset_admin_password: true</code></pre>
-                        <ol start="2" class="list-decimal list-inside ml-4 space-y-1">
-                            <li>Restart: <code>docker restart frigate</code></li>
-                            <li>Check logs: <code>docker logs frigate | grep password</code></li>
-                            <li><strong>REMOVE</strong> that line from config after getting new password</li>
-                            <li>Change password in UI: Settings → Users</li>
+                        <ol start="3" class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Restart Frigate: <code>docker restart frigate</code></li>
+                            <li>Check logs again: <code>docker logs frigate 2>&1 | grep -i password</code></li>
+                            <li>Copy the new password and log in to the UI</li>
+                            <li><strong>IMPORTANT:</strong> Remove the <code>reset_admin_password: true</code> line from config immediately</li>
+                            <li>Change password in UI: Settings → Users → Update Password</li>
+                            <li>Choose a strong password and save it securely</li>
                         </ol>
-                        <p class="mt-3"><strong>Username is always:</strong> <code class="text-green-400">admin</code></p>
+
+                        <p class="mt-4"><strong>⚠️ SECURITY NOTES:</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Username is always: <code class="text-green-400">admin</code> (lowercase)</li>
+                            <li>Always change the default password immediately after first login</li>
+                            <li>Never leave <code>reset_admin_password: true</code> in your config permanently</li>
+                            <li>Store your password in a password manager</li>
+                            <li>Enable two-factor authentication if available in future versions</li>
+                        </ul>
                     </div>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold mb-3">🎯 Detection Models Guide</h3>
+                    <h3 class="text-2xl font-bold mb-3">🎥 Finding Your Camera RTSP URLs</h3>
                     <div class="space-y-3 text-gray-300">
-                        <p><strong>Default model (included):</strong></p>
+                        <p><strong>Method 1: Camera Web Interface (Most Reliable)</strong></p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Find your camera's IP address (check router DHCP table or use IP scanner like Advanced IP Scanner)</li>
+                            <li>Open web browser and navigate to <code>http://CAMERA_IP</code></li>
+                            <li>Log in with camera credentials (common defaults: admin/admin, admin/12345, admin/password)</li>
+                            <li>Navigate to Settings → Network → Stream or Video Settings</li>
+                            <li>Look for RTSP settings or Stream URLs</li>
+                            <li>Copy both "Main Stream" (high resolution) and "Sub Stream" (low resolution) URLs</li>
+                            <li>Note the resolution, bitrate, and encoding settings for each stream</li>
+                        </ol>
+                        
+                        <p class="mt-4"><strong>Method 2: Test with VLC Media Player</strong></p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Download and install VLC from <a href="https://www.videolan.org" class="text-blue-400 hover:underline" target="_blank">videolan.org</a></li>
+                            <li>Open VLC → Media → Open Network Stream</li>
+                            <li>Try common RTSP URL formats (see below)</li>
+                            <li>If video plays successfully, that's your working RTSP URL!</li>
+                            <li>Right-click video → Codec Information to see resolution and bitrate</li>
+                        </ol>
+
+                        <p class="mt-4"><strong>Method 3: ONVIF Device Manager (Advanced)</strong></p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Download ONVIF Device Manager</li>
+                            <li>Scan your network for ONVIF-compatible cameras</li>
+                            <li>Device manager will display all available streams with exact URLs</li>
+                            <li>This works for most modern IP cameras</li>
+                        </ol>
+
+                        <p class="mt-4"><strong>Common RTSP URL Formats by Camera Brand:</strong></p>
+                        <div class="bg-gray-900 rounded p-3 space-y-2 text-sm">
+                            <p><strong class="text-blue-400">Hikvision:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/Streaming/Channels/101</code> (main stream)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102</code> (sub stream)
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Dahua / Loryta / Amcrest:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=0</code> (main)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=1</code> (sub)
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Reolink:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/h264Preview_01_main</code> (main stream)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/h264Preview_01_sub</code> (sub stream)
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Amcrest (Alternative Format):</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=0</code>
+                            
+                            <p class="mt-3"><strong class="text-blue-400">Generic / ONVIF Cameras:</strong></p>
+                            <code>rtsp://admin:password@192.168.1.64:554/stream1</code> (main)<br>
+                            <code>rtsp://admin:password@192.168.1.64:554/stream2</code> (sub)<br>
+                            <p class="text-xs mt-1">Also try: /live, /h264, /cam1, /video1, /live/main, /live/sub</p>
+
+                            <p class="mt-3"><strong class="text-blue-400">Unifi Protect:</strong></p>
+                            <code>rtsp://username:password@192.168.1.64:7447/CAMERA_ID</code>
+                            <p class="text-xs mt-1">Note: Unifi cameras require specific format, check Unifi documentation</p>
+                        </div>
+
+                        <p class="mt-4"><strong>Troubleshooting RTSP Connection:</strong></p>
                         <ul class="list-disc list-inside ml-4">
-                            <li><strong>SSDLite MobileNet v2</strong> - 300×300 - Balanced speed/accuracy, no setup needed</li>
+                            <li><strong>Camera unreachable:</strong> Ensure camera and server are on same network or properly routed subnet</li>
+                            <li><strong>Authentication failed:</strong> Double-check username and password (URL encoding needed for special characters)</li>
+                            <li><strong>Port blocked:</strong> Default RTSP port is 554, check firewall rules on server and camera</li>
+                            <li><strong>Stream not found:</strong> Try different stream paths, check camera documentation</li>
+                            <li><strong>Connection timeout:</strong> Some cameras need <code>?tcp</code> at end of URL to force TCP mode</li>
+                            <li><strong>H.265 codec issues:</strong> Ensure camera is set to H.264 for maximum compatibility</li>
+                            <li><strong>Multiple channels:</strong> For multi-channel cameras, change channel=1 to channel=2, channel=3, etc.</li>
                         </ul>
 
-                        <p class="mt-4"><strong>Additional models (require download):</strong></p>
+                        <p class="mt-4"><strong>Best Practices for Camera Configuration:</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Main stream:</strong> 1920×1080 (1080p) @ 15fps, 4096-6144 kbps, H.264 encoding</li>
+                            <li><strong>Sub stream:</strong> 1280×720 (720p) @ 5fps, 1024-2048 kbps, H.264 encoding</li>
+                            <li><strong>Frame rate:</strong> 15fps for main, 5fps for sub (higher FPS = more storage/bandwidth)</li>
+                            <li><strong>Bitrate mode:</strong> CBR (Constant Bitrate) strongly recommended over VBR</li>
+                            <li><strong>I-frame interval:</strong> Set to match framerate (e.g., 15 for 15fps)</li>
+                            <li><strong>Disable:</strong> WDR, HDR, 3D-NR on sub stream (keeps detection fast)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">⚙️ Hardware Acceleration Complete Guide</h3>
+                    <div class="space-y-4 text-gray-300">
+                        
+                        <div class="bg-blue-900 bg-opacity-30 border border-blue-600 rounded p-4">
+                            <p class="font-bold text-blue-400 mb-2">Intel GPU (VAAPI) - RECOMMENDED for Most Users</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li><strong>Best for:</strong> Intel CPUs with integrated graphics (6th gen+), Intel Arc GPUs</li>
+                                <li><strong>Performance:</strong> Excellent H.264/H.265 encoding and decoding, low power consumption</li>
+                                <li><strong>Cost:</strong> Free (built into CPU), no additional hardware needed</li>
+                                <li><strong>Compatibility:</strong> Works with 10-15+ cameras simultaneously</li>
+                                <li><strong>Setup:</strong> Requires <code>/dev/dri</code> device passthrough (automatically configured by this tool)</li>
+                                <li><strong>Detector:</strong> Pair with OpenVINO detector for GPU-accelerated AI inference</li>
+                            </ul>
+                            <p class="mt-3"><strong>Setup Commands (on host machine):</strong></p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code># Add current user to render and video groups
+sudo usermod -aG render,video $(whoami)
+
+# Set permissions for DRI devices
+sudo chmod -R 777 /dev/dri
+
+# IMPORTANT: Logout and login OR reboot for changes to take effect
+sudo reboot</code></pre>
+                            <p class="mt-2 text-sm">Verify GPU access after reboot:</p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code># Check DRI devices exist
+ls -la /dev/dri
+# Should see: card0, renderD128, etc.
+
+# Test hardware acceleration (install vainfo if needed)
+vainfo
+# Should display GPU model and supported codecs</code></pre>
+                        </div>
+
+                        <div class="bg-green-900 bg-opacity-30 border border-green-600 rounded p-4 mt-4">
+                            <p class="font-bold text-green-400 mb-2">Google Coral Edge TPU - BEST Performance/Watt</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li><strong>Best for:</strong> Dedicated AI acceleration, maximum efficiency, low power setups</li>
+                                <li><strong>Performance:</strong> 4 TOPS (trillion operations per second), ~2W power consumption</li>
+                                <li><strong>Capacity:</strong> Handles 10-15 cameras per Coral device at 5fps detection</li>
+                                <li><strong>Cost:</strong> ~$25-60 USD depending on model (USB vs PCIe/M.2)</li>
+                                <li><strong>Models:</strong> USB Accelerator (plug-and-play), M.2/PCIe (faster, requires compatible slot)</li>
+                                <li><strong>Limitation:</strong> Only works with EdgeTPU-compatible models (pre-compiled)</li>
+                            </ul>
+                            <p class="mt-3"><strong>Setup for USB Coral:</strong></p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code># Install EdgeTPU runtime on host
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt update
+sudo apt install libedgetpu1-std
+
+# Verify Coral is detected
+lsusb | grep "Google"
+# Should show: "Global Unichip Corp. Google Coral"</code></pre>
+                            <p class="mt-3"><strong>Setup for PCIe/M.2 Coral:</strong></p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code># Install drivers
+sudo apt install gasket-dkms libedgetpu1-std
+
+# Load kernel module
+sudo modprobe apex
+
+# Verify device
+ls /dev/apex_0
+# Should exist if detected correctly</code></pre>
+                            <p class="mt-2 text-sm text-yellow-300"><strong>⚠️ Note:</strong> Coral TPU only supports specific pre-compiled models. Cannot use custom YOLO models without conversion.</p>
+                        </div>
+
+                        <div class="bg-purple-900 bg-opacity-30 border border-purple-600 rounded p-4 mt-4">
+                            <p class="font-bold text-purple-400 mb-2">NVIDIA GPU - For Dedicated Graphics Cards</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li><strong>Best for:</strong> Existing NVIDIA GTX/RTX card owners, TensorRT acceleration</li>
+                                <li><strong>Performance:</strong> Best AI inference speed with TensorRT, excellent encoding with NVENC</li>
+                                <li><strong>Capacity:</strong> 20-30+ cameras depending on GPU model</li>
+                                <li><strong>Cost:</strong> $200-2000+ USD (if buying new)</li>
+                                <li><strong>Power:</strong> Higher power consumption (75-350W depending on model)</li>
+                                <li><strong>Requirements:</strong> NVIDIA Container Toolkit must be installed on host</li>
+                            </ul>
+                            <p class="mt-3"><strong>Install NVIDIA Container Toolkit (Debian/Ubuntu):</strong></p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code># Add NVIDIA repository
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+  sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# Install toolkit
+sudo apt update
+sudo apt install -y nvidia-container-toolkit
+
+# Configure Docker
+sudo nvidia-ctk runtime configure --runtime=docker
+
+# Restart Docker
+sudo systemctl restart docker</code></pre>
+                            <p class="mt-2"><strong>Verify GPU access in container:</strong></p>
+                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code>docker exec frigate nvidia-smi
+# Should display GPU stats and memory usage</code></pre>
+                        </div>
+
+                        <div class="bg-yellow-900 bg-opacity-30 border border-yellow-600 rounded p-4 mt-4">
+                            <p class="font-bold text-yellow-400 mb-2">CPU Only - Universal Compatibility</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li><strong>Best for:</strong> Testing, temporary setups, very low camera count (1-2 cameras)</li>
+                                <li><strong>Performance:</strong> Slowest option, high CPU usage, not recommended for production</li>
+                                <li><strong>Capacity:</strong> 1-2 cameras at 720p, 5fps detection maximum</li>
+                                <li><strong>Cost:</strong> Free, no additional hardware</li>
+                                <li><strong>Setup:</strong> No special configuration needed</li>
+                                <li><strong>Recommendation:</strong> Only use if no other option available, upgrade to GPU/Coral ASAP</li>
+                            </ul>
+                            <p class="mt-2 text-sm"><strong>Optimization tips for CPU-only:</strong></p>
+                            <ul class="list-disc list-inside ml-6 text-sm">
+                                <li>Lower detection FPS to 3fps instead of 5fps</li>
+                                <li>Use lowest resolution sub stream possible (640×480 if available)</li>
+                                <li>Limit to 1-2 cameras maximum</li>
+                                <li>Disable motion mask (let motion detection reduce load)</li>
+                                <li>Use SSDLite MobileNet v2 model (fastest)</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-red-900 bg-opacity-30 border border-red-600 rounded p-4 mt-4">
+                            <p class="font-bold text-red-400 mb-2">AMD GPU (ROCm) - Experimental</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li><strong>Status:</strong> Experimental support, limited testing</li>
+                                <li><strong>Best for:</strong> AMD GPU owners willing to troubleshoot</li>
+                                <li><strong>Performance:</strong> Varies by model, generally good encoding but limited AI acceleration</li>
+                                <li><strong>Requirements:</strong> ROCm drivers and runtime installed</li>
+                                <li><strong>Recommendation:</strong> Only use if you already own AMD GPU, otherwise choose Intel/NVIDIA/Coral</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-purple-900 bg-opacity-30 border border-purple-600 rounded p-4 mt-4">
+                            <p class="font-bold text-purple-400 mb-2">🖥️ Proxmox GPU Sharing Guide</p>
+                            <p class="text-sm mb-2"><strong>Intel integrated GPUs can be shared between Proxmox host and LXC containers</strong>, but NOT with VMs (requires full passthrough for VMs).</p>
+                            
+                            <p class="mt-3"><strong>Share Intel iGPU with LXC Container (Recommended):</strong></p>
+                            <ol class="list-decimal list-inside ml-4 space-y-2 text-sm">
+                                <li><strong>On Proxmox host, identify GPU devices:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>ls -la /dev/dri
+# Note the major:minor numbers (usually 226:0 and 226:128)</code></pre>
+                                </li>
+                                <li><strong>Edit LXC container configuration (replace 103 with your container ID):</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>nano /etc/pve/lxc/103.conf</code></pre>
+                                </li>
+                                <li><strong>Add these lines at the bottom of the file:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code># GPU passthrough for Frigate
+lxc.cgroup2.devices.allow: c 226:0 rwm
+lxc.cgroup2.devices.allow: c 226:128 rwm
+lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir
+lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file</code></pre>
+                                </li>
+                                <li><strong>Save file and start/restart the container:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>pct start 103</code></pre>
+                                </li>
+                                <li><strong>Inside container, verify GPU access:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>ls -la /dev/dri
+# Should see renderD128 and card0
+
+# Install vainfo to test (optional)
+apt install -y vainfo
+vainfo
+# Should display Intel GPU information</code></pre>
+                                </li>
+                                <li><strong>Add user to required groups (inside container):</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>usermod -aG render,video root</code></pre>
+                                </li>
+                            </ol>
+
+                            <p class="mt-3 text-yellow-300"><strong>⚠️ IMPORTANT: VM GPU Passthrough Limitations</strong></p>
+                            <p class="text-sm">You CANNOT share a GPU between Proxmox host + VM + LXC simultaneously.</p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li><strong>LXC containers:</strong> Can share GPU with host (host retains control, multiple containers can use same GPU)</li>
+                                <li><strong>VMs:</strong> Require full PCI passthrough (GPU exclusively assigned, no sharing possible)</li>
+                                <li><strong>Solution for multi-use:</strong> Use separate GPUs, OR run Frigate in LXC instead of VM</li>
+                                <li><strong>Recommendation:</strong> Use LXC for Frigate (lighter, better GPU sharing, easier management)</li>
+                            </ul>
+
+                            <p class="mt-3"><strong>Full PCI Passthrough to VM (Intel iGPU - Advanced):</strong></p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li><strong>Enable IOMMU in BIOS:</strong>
+                                    <ul class="list-disc list-inside ml-6">
+                                        <li>Intel: Enable VT-d</li>
+                                        <li>AMD: Enable AMD-Vi</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Edit GRUB configuration:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>nano /etc/default/grub
+
+# Find line: GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+# Change to:
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
+
+# For AMD CPU, use:
+GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt"
+
+# Save and update GRUB
+update-grub
+reboot</code></pre>
+                                </li>
+                                <li><strong>Find GPU PCI address:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code>lspci -nn | grep VGA
+# Example output: 00:02.0 VGA compatible controller [0300]: Intel Corporation [8086:9a49]
+# Note the address: 00:02.0</code></pre>
+                                </li>
+                                <li><strong>In Proxmox UI:</strong>
+                                    <ul class="list-disc list-inside ml-6">
+                                        <li>Select VM → Hardware → Add → PCI Device</li>
+                                        <li>Select your GPU (00:02.0)</li>
+                                        <li>Check "All Functions"</li>
+                                        <li>Check "Primary GPU" if using for VM display</li>
+                                        <li>Click Add</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Start VM and verify:</strong>
+                                    <pre class="bg-gray-900 rounded p-2 mt-1"><code># Inside VM
+lspci | grep VGA
+# Should show GPU passed through</code></pre>
+                                </li>
+                            </ol>
+
+                            <p class="mt-3"><strong>Troubleshooting Proxmox GPU Issues:</strong></p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li><strong>Permission denied in LXC:</strong> Verify cgroup2 rules and mount entries in config</li>
+                                <li><strong>Device not found:</strong> Check major:minor numbers with <code>ls -la /dev/dri</code> on host</li>
+                                <li><strong>VM passthrough fails:</strong> Ensure IOMMU enabled in BIOS and GRUB</li>
+                                <li><strong>Black screen after passthrough:</strong> Try disabling "Primary GPU" option</li>
+                                <li><strong>Conflicting usage:</strong> Cannot passthrough GPU being used by Proxmox console</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🎯 Detection Models Complete Guide</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>Models included by default in Frigate:</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>SSDLite MobileNet v2</strong> (OpenVINO/CPU) - 300×300 - Default, balanced speed/accuracy, no setup required</li>
+                            <li><strong>SSD MobileNet v2</strong> (EdgeTPU) - Optimized for Google Coral, excellent efficiency</li>
+                        </ul>
+
+                        <p class="mt-4"><strong>Additional models (require manual download and configuration):</strong></p>
                         
                         <div class="bg-gray-900 rounded p-4 mt-3">
-                            <p class="font-bold mb-2">YOLOv8 Nano (Recommended upgrade)</p>
+                            <p class="font-bold mb-2">YOLOv8 Nano - Recommended Upgrade</p>
+                            <p class="text-sm mb-2"><strong>Advantages:</strong> Better accuracy than default, modern architecture, 640×640 input</p>
                             <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
-                                <li>Download model:
+                                <li>Download YOLOv8n ONNX model:
                                     <pre class="bg-black rounded p-2 mt-1"><code>mkdir -p /opt/frigate/config/model_cache
 cd /opt/frigate/config/model_cache
-# Download YOLOv8n ONNX from Ultralytics
-wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx</code></pre>
+
+# Download from Ultralytics GitHub
+wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx
+
+# Verify file downloaded
+ls -lh yolov8n.onnx</code></pre>
                                 </li>
-                                <li>Update config.yml:
-                                    <pre class="bg-black rounded p-2 mt-1"><code>model:
+                                <li>Update config.yml model section:
+                                    <pre class="bg-black rounded p-2 mt-1"><code class="language-yaml">model:
   path: /config/model_cache/yolov8n.onnx
+  input_tensor: nchw
+  input_pixel_format: bgr
+  width: 640
+  height: 640
+  labelmap_path: /openvino-model/coco_80cl.txt</code></pre>
+                                </li>
+                                <li>Restart Frigate and test:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>docker restart frigate
+docker logs frigate -f | grep model</code></pre>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">YOLOv9 Compact - Better Accuracy</p>
+                            <p class="text-sm mb-2"><strong>Advantages:</strong> Improved detection, especially for small objects, newer architecture</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Download YOLOv9c from official repository</li>
+                                <li>Convert to ONNX format if necessary:
+                                    <pre class="bg-black rounded p-2 mt-1"><code># If you have .pt file, convert to ONNX
+pip install ultralytics
+python -c "from ultralytics import YOLO; YOLO('yolov9c.pt').export(format='onnx')"</code></pre>
+                                </li>
+                                <li>Place <code>yolov9c.onnx</code> in <code>/opt/frigate/config/model_cache/</code></li>
+                                <li>Update config.yml:
+                                    <pre class="bg-black rounded p-2 mt-1"><code class="language-yaml">model:
+  path: /config/model_cache/yolov9c.onnx
   input_tensor: nchw
   input_pixel_format: bgr
   width: 640
@@ -342,164 +747,1360 @@ wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx
                         </div>
 
                         <div class="bg-gray-900 rounded p-4 mt-3">
-                            <p class="font-bold mb-2">YOLOv9 Compact (Better accuracy)</p>
+                            <p class="font-bold mb-2">YOLOv10 Nano - Newest Generation</p>
+                            <p class="text-sm mb-2"><strong>Advantages:</strong> Latest YOLO architecture, improved speed/accuracy balance</p>
                             <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
-                                <li>Download from official YOLOv9 repo</li>
-                                <li>Convert to ONNX format</li>
-                                <li>Place in <code>/opt/frigate/config/model_cache/</code></li>
-                                <li>Update config with path and 640×640 input size</li>
+                                <li>Download from Ultralytics repository</li>
+                                <li>Convert to ONNX if needed</li>
+                                <li>Configure with 640×640 input size and nchw tensor format</li>
                             </ol>
                         </div>
 
                         <div class="bg-gray-900 rounded p-4 mt-3">
-                            <p class="font-bold mb-2">YOLOv11 Nano (Latest model)</p>
+                            <p class="font-bold mb-2">YOLOv11 Nano - Latest Model (Experimental)</p>
+                            <p class="text-sm mb-2"><strong>Advantages:</strong> Cutting-edge performance, may require testing</p>
                             <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
-                                <li>Download from Ultralytics: <code>yolov11n.onnx</code></li>
-                                <li>Place in model cache directory</li>
-                                <li>Configure 640×640 input size in config.yml</li>
+                                <li>Download YOLOv11n ONNX:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>cd /opt/frigate/config/model_cache
+wget [URL_to_yolov11n.onnx]  # Check Ultralytics releases</code></pre>
+                                </li>
+                                <li>Configure with 640×640 input, nchw tensor format</li>
+                                <li>Test thoroughly before production use</li>
                             </ol>
                         </div>
 
-                        <p class="mt-4 text-yellow-300"><strong>⚠️ Important:</strong></p>
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">YOLOX Tiny - Lightweight Option</p>
+                            <p class="text-sm mb-2"><strong>Advantages:</strong> Faster than default on some hardware, 416×416 input</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Download from Intel OpenVINO Model Zoo:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>cd /opt/frigate/config/model_cache
+wget https://github.com/openvinotoolkit/open_model_zoo/raw/master/models/public/yolox-tiny/FP16/yolox-tiny.xml
+wget https://github.com/openvinotoolkit/open_model_zoo/raw/master/models/public/yolox-tiny/FP16/yolox-tiny.bin</code></pre>
+                                </li>
+                                <li>Update config.yml:
+                                    <pre class="bg-black rounded p-2 mt-1"><code class="language-yaml">model:
+  path: /config/model_cache/yolox-tiny.xml
+  input_tensor: nchw
+  input_pixel_format: bgr
+  width: 416
+  height: 416</code></pre>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <p class="mt-4 text-yellow-300"><strong>⚠️ Important Model Considerations:</strong></p>
                         <ul class="list-disc list-inside ml-4 text-sm">
-                            <li>Larger models = better accuracy but slower detection</li>
-                            <li>Default SSDLite MobileNet v2 is excellent for most use cases</li>
-                            <li>Test new models before deploying to production</li>
+                            <li><strong>Model size vs. speed:</strong> Larger models (YOLOv9, YOLOv11) = better accuracy but slower detection</li>
+                            <li><strong>Input resolution:</strong> Higher input resolution = better small object detection but slower</li>
+                            <li><strong>Testing required:</strong> Always test new models with your cameras before production deployment</li>
+                            <li><strong>Default is excellent:</strong> SSDLite MobileNet v2 works great for most use cases, don't fix what isn't broken</li>
+                            <li><strong>Hardware dependency:</strong> Model performance varies significantly by detector type (OpenVINO vs Coral vs CPU)</li>
+                            <li><strong>Coral limitation:</strong> Coral Edge TPU only supports pre-compiled EdgeTPU models, cannot use YOLO without complex conversion</li>
                         </ul>
-                    </div>
-                </section>
 
-                <section>
-                    <h3 class="text-2xl font-bold mb-3">🎥 Finding Camera RTSP URLs</h3>
-                    <div class="space-y-3 text-gray-300">
-                        <p><strong>Common RTSP URL formats by brand:</strong></p>
-                        <div class="bg-gray-900 rounded p-3 space-y-2 text-sm">
-                            <p><strong class="text-blue-400">Hikvision:</strong></p>
-                            <code>rtsp://admin:password@192.168.1.64:554/Streaming/Channels/101</code> (main)<br>
-                            <code>rtsp://admin:password@192.168.1.64:554/Streaming/Channels/102</code> (sub)
-                            
-                            <p class="mt-3"><strong class="text-blue-400">Dahua / Loryta:</strong></p>
-                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=0</code> (main)<br>
-                            <code>rtsp://admin:password@192.168.1.64:554/cam/realmonitor?channel=1&subtype=1</code> (sub)
-                            
-                            <p class="mt-3"><strong class="text-blue-400">Reolink:</strong></p>
-                            <code>rtsp://admin:password@192.168.1.64:554/h264Preview_01_main</code> (main)<br>
-                            <code>rtsp://admin:password@192.168.1.64:554/h264Preview_01_sub</code> (sub)
-                            
-                            <p class="mt-3"><strong class="text-blue-400">Generic:</strong></p>
-                            <code>rtsp://admin:password@192.168.1.64:554/stream1</code>
+                        <p class="mt-4"><strong>Model Performance Comparison:</strong></p>
+                        <div class="bg-gray-900 rounded p-3 text-xs">
+                            <table class="w-full">
+                                <tr class="border-b border-gray-700">
+                                    <th class="text-left p-2">Model</th>
+                                    <th class="text-left p-2">Input Size</th>
+                                    <th class="text-left p-2">Speed</th>
+                                    <th class="text-left p-2">Accuracy</th>
+                                    <th class="text-left p-2">Best For</th>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="p-2">SSDLite MobileNet v2</td>
+                                    <td class="p-2">300×300</td>
+                                    <td class="p-2">⚡⚡⚡⚡</td>
+                                    <td class="p-2">⭐⭐⭐</td>
+                                    <td class="p-2">Default, balanced</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="p-2">YOLOv8 Nano</td>
+                                    <td class="p-2">640×640</td>
+                                    <td class="p-2">⚡⚡⚡</td>
+                                    <td class="p-2">⭐⭐⭐⭐</td>
+                                    <td class="p-2">Best overall upgrade</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="p-2">YOLOv9 Compact</td>
+                                    <td class="p-2">640×640</td>
+                                    <td class="p-2">⚡⚡</td>
+                                    <td class="p-2">⭐⭐⭐⭐⭐</td>
+                                    <td class="p-2">High accuracy needs</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="p-2">YOLOX Tiny</td>
+                                    <td class="p-2">416×416</td>
+                                    <td class="p-2">⚡⚡⚡⚡</td>
+                                    <td class="p-2">⭐⭐⭐</td>
+                                    <td class="p-2">Speed priority</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">EdgeTPU (Coral)</td>
+                                    <td class="p-2">320×320</td>
+                                    <td class="p-2">⚡⚡⚡⚡⚡</td>
+                                    <td class="p-2">⭐⭐⭐</td>
+                                    <td class="p-2">Max efficiency</td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold mb-3">⚙️ Hardware Acceleration Setup</h3>
+                    <h3 class="text-2xl font-bold mb-3">📊 Stream Encoding: CBR vs VBR Explained</h3>
                     <div class="space-y-3 text-gray-300">
-                        <div class="bg-blue-900 bg-opacity-30 border border-blue-600 rounded p-4">
-                            <p class="font-bold text-blue-400 mb-2">Intel GPU (VAAPI) - Recommended</p>
-                            <pre class="bg-gray-900 rounded p-3 mt-2 text-sm"><code>sudo usermod -aG render,video $(whoami)
-sudo chmod -R 777 /dev/dri
-# Logout and login</code></pre>
+                        <p><strong>Understanding bitrate encoding modes is CRITICAL for Frigate stability.</strong></p>
+                        
+                        <div class="bg-gray-900 rounded p-4">
+                            <p class="font-bold text-green-400 mb-2">✅ CBR (Constant Bitrate) - STRONGLY RECOMMENDED for Frigate</p>
+                            <p class="mb-2"><strong>How it works:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Maintains steady bitrate regardless of scene complexity</li>
+                                <li>Simple scenes get more quality than needed (slight "waste")</li>
+                                <li>Complex scenes get exactly enough bitrate (no drops)</li>
+                                <li>Network bandwidth is predictable and constant</li>
+                            </ul>
+                            <p class="mt-3"><strong>Pros:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Predictable bandwidth usage (easy to calculate storage requirements)</li>
+                                <li>Stable stream quality at all times</li>
+                                <li>Better for AI detection (consistent frame quality)</li>
+                                <li>No bitrate spikes causing network congestion</li>
+                                <li>Easier to troubleshoot issues</li>
+                            </ul>
+                            <p class="mt-3"><strong>Cons:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Slightly larger file sizes during static scenes (5-10% more storage)</li>
+                                <li>Potentially "wastes" bitrate when nothing is happening</li>
+                            </ul>
+                            <p class="mt-3"><strong>Recommended bitrates:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li><strong>Sub stream (720p @ 5fps):</strong> 1024-2048 kbps</li>
+                                <li><strong>Main stream (1080p @ 15fps):</strong> 4096-6144 kbps</li>
+                                <li><strong>Main stream (4K @ 15fps):</strong> 8192-16384 kbps</li>
+                            </ul>
+                            <p class="mt-3 text-green-300"><strong>✅ USE CBR for all Frigate cameras - main and sub streams!</strong></p>
                         </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold text-yellow-400 mb-2">⚠️ VBR (Variable Bitrate) - Use with EXTREME Caution</p>
+                            <p class="mb-2"><strong>How it works:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Adjusts bitrate dynamically based on scene complexity</li>
+                                <li>Static scenes use very low bitrate (saves bandwidth/storage)</li>
+                                <li>Complex scenes spike to higher bitrate (better quality)</li>
+                                <li>Unpredictable bandwidth consumption</li>
+                            </ul>
+                            <p class="mt-3"><strong>Pros:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Smaller file sizes for static scenes (20-30% storage savings)</li>
+                                <li>Potentially better quality during action scenes</li>
+                                <li>Efficient bandwidth usage when nothing happening</li>
+                            </ul>
+                            <p class="mt-3"><strong>Cons (MAJOR ISSUES FOR FRIGATE):</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Unpredictable bandwidth spikes can overload network</li>
+                                <li>Bitrate can drop TOO LOW during motion, causing blocky detection frames</li>
+                                <li>AI detection suffers from inconsistent frame quality</li>
+                                <li>False negatives (missed detections) when bitrate drops during critical moments</li>
+                                <li>Network buffer issues causing frame drops</li>
+                                <li>Difficult to troubleshoot ("sometimes it works, sometimes it doesn't")</li>
+                            </ul>
+                            <p class="mt-3 text-red-300"><strong>⛔ Problem scenario:</strong> Person walks across frame → camera lowers bitrate to save bandwidth → blocky frames → Frigate misses detection!</p>
+                            <p class="mt-3"><strong>Only use VBR if:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Severely bandwidth-constrained network (e.g., remote location with cellular)</li>
+                                <li>Camera supports "minimum quality floor" setting (prevents bitrate from dropping too low)</li>
+                                <li>You're willing to sacrifice detection accuracy for storage savings</li>
+                                <li>Extensive testing done with your specific cameras and scenarios</li>
+                            </ul>
+                        </div>
+
+                        <p class="mt-4"><strong>How to configure encoding in camera:</strong></p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Log into camera web interface</li>
+                            <li>Navigate to Video Settings or Stream Configuration</li>
+                            <li>For EACH stream (main and sub):
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Set "Rate Control" or "Bitrate Mode" to <strong>CBR</strong></li>
+                                    <li>Set bitrate to recommended values above</li>
+                                    <li>Set I-frame interval (GOP) to match framerate (e.g., 15 for 15fps stream)</li>
+                                    <li>Set encoding to H.264 (not H.265/HEVC unless specific requirement)</li>
+                                    <li>Disable smart encoding, WDR, 3D-NR on sub stream (keeps detection fast)</li>
+                                </ul>
+                            </li>
+                            <li>Save settings and test stream in VLC before deploying</li>
+                        </ol>
+
+                        <p class="mt-4"><strong>Verifying your stream configuration:</strong></p>
+                        <pre class="bg-gray-900 rounded p-3 text-sm"><code># Test with FFmpeg
+ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,bit_rate,r_frame_rate,width,height rtsp://admin:pass@192.168.1.64/stream1
+
+# Check bitrate stability over time
+ffmpeg -i rtsp://admin:pass@192.168.1.64/stream1 -t 60 -f null - 2>&1 | grep bitrate</code></pre>
                     </div>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold mb-3">📦 Deployment Steps</h3>
+                    <h3 class="text-2xl font-bold mb-3">💾 Storage Requirements Calculator & Best Practices</h3>
                     <div class="space-y-3 text-gray-300">
-                        <pre class="bg-gray-900 rounded p-3"><code>mkdir -p /opt/frigate/config
-cd /opt/frigate
-# Paste docker-compose.yml
+                        <p><strong>Formula for storage calculation:</strong></p>
+                        <div class="bg-gray-900 rounded p-3">
+                            <code>Storage (GB) = Cameras × Bitrate (Mbps) × Hours × 0.45</code>
+                            <p class="text-xs mt-2">The 0.45 factor accounts for H.264 compression efficiency</p>
+                        </div>
+                        
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Example Calculation: 4 cameras, 24/7 recording</p>
+                            <p class="text-sm mb-2"><strong>Configuration:</strong></p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li>Sub stream: 1280×720 @ 5fps, 2 Mbps (for detection - NOT recorded)</li>
+                                <li>Main stream: 1920×1080 @ 15fps, 5 Mbps (for recording)</li>
+                                <li>4 cameras total</li>
+                                <li>24/7 continuous recording</li>
+                            </ul>
+                            <p class="text-sm mb-2 mt-3"><strong>Calculation:</strong></p>
+                            <pre class="bg-black rounded p-3 text-xs"><code>Per camera per day:
+5 Mbps × 24 hours × 0.45 = 54 GB/day
+
+All 4 cameras per day:
+54 GB × 4 cameras = 216 GB/day
+
+Weekly storage:
+216 GB × 7 days = 1,512 GB = 1.5 TB/week
+
+Monthly storage:
+216 GB × 30 days = 6,480 GB = 6.5 TB/month
+
+Yearly storage:
+216 GB × 365 days = 78,840 GB = 79 TB/year</code></pre>
+                        </div>
+
+                        <p class="mt-4"><strong>Storage Recommendations by Camera Count:</strong></p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>1-2 cameras:</strong> 1TB minimum, 2TB recommended (30 days retention)</li>
+                            <li><strong>3-4 cameras:</strong> 2TB minimum, 4TB recommended (14-30 days retention)</li>
+                            <li><strong>5-8 cameras:</strong> 4TB minimum, 8TB recommended (10-20 days retention)</li>
+                            <li><strong>8-12 cameras:</strong> 8TB minimum, 12-16TB recommended (7-14 days retention)</li>
+                            <li><strong>12+ cameras:</strong> 12TB+, consider NAS or RAID array</li>
+                        </ul>
+
+                        <p class="mt-4"><strong>Storage Best Practices:</strong></p>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Separate storage types:</strong>
+                                <ul class="list-disc list-inside ml-6 text-sm">
+                                    <li>SSD: Frigate database, clips, snapshots (fast access needed)</li>
+                                    <li>HDD: Continuous recordings (large capacity, sequential writes)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Two-tier retention:</strong>
+                                <ul class="list-disc list-inside ml-6 text-sm">
+                                    <li>Continuous recordings: 3-7 days (fills storage quickly)</li>
+                                    <li>Event recordings: 30-90 days (smaller size, important footage)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Motion-based recording:</strong> Saves 60-90% storage vs 24/7 for low-activity areas</li>
+                            <li><strong>Monitor disk health:</strong> Use smartmontools to check drive status weekly</li>
+                            <li><strong>Plan for growth:</strong> Buy 50% more storage than calculated (future cameras, longer retention)</li>
+                            <li><strong>Backup strategy:</strong> Config + database weekly, important clips monthly</li>
+                        </ul>
+
+                        <p class="mt-4"><strong>Storage Hardware Recommendations:</strong></p>
+                        <div class="bg-gray-900 rounded p-3">
+                            <p class="font-bold mb-2">For Small Setup (1-4 cameras):</p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li>Single 4TB HDD (WD Purple or Seagate SkyHawk surveillance-rated)</li>
+                                <li>Or: 2TB SSD (Samsung 870 QVO) if space-constrained</li>
+                            </ul>
+                            <p class="font-bold mb-2 mt-3">For Medium Setup (5-12 cameras):</p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li>Primary: 250GB SSD (database/clips)</li>
+                                <li>Secondary: 8-12TB surveillance HDD (recordings)</li>
+                                <li>Consider 2×HDD in RAID1 for redundancy</li>
+                            </ul>
+                            <p class="font-bold mb-2 mt-3">For Large Setup (12+ cameras):</p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li>NAS with 4-8 bay: Synology, QNAP, or TrueNAS</li>
+                                <li>RAID5 or RAID6 configuration</li>
+                                <li>Dedicated 500GB SSD for Frigate database</li>
+                                <li>Multiple HDDs for recording pool (16-32TB total)</li>
+                            </ul>
+                        </div>
+
+                        <p class="mt-4"><strong>Monitoring storage usage:</strong></p>
+                        <pre class="bg-gray-900 rounded p-3 text-sm"><code># Check overall storage
+df -h /mnt/frigate
+
+# Check per-camera usage
+du -sh /mnt/frigate/recordings/*
+
+# Find oldest recordings
+find /mnt/frigate/recordings -type f -printf '%T+ %p\n' | sort | head -20
+
+# Check database size
+du -sh /opt/frigate/config/frigate.db</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">📦 Deployment Steps (Complete Walkthrough)</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>On your Linux server (Proxmox/Ubuntu/Debian/Any Linux):</strong></p>
+                        
+                        <p class="font-bold mt-4 mb-2">Step 1: Create directory structure</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Create Frigate directories
+sudo mkdir -p /opt/frigate/config
+sudo mkdir -p /mnt/frigate
+
+# Set permissions (replace 'youruser' with your username)
+sudo chown -R youruser:youruser /opt/frigate
+sudo chown -R youruser:youruser /mnt/frigate
+
+# Navigate to Frigate directory
+cd /opt/frigate</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 2: Save docker-compose.yml</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Open nano editor
 nano docker-compose.yml
-# Paste config.yml
+
+# Paste the generated docker-compose.yml from this tool
+# (Copy from the green "Copy to Clipboard" button above)
+
+# Save and exit:
+# Press Ctrl+O (save)
+# Press Enter (confirm filename)
+# Press Ctrl+X (exit)</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 3: Save config.yml</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Open nano editor for config
 nano config/config.yml
+
+# Paste the generated config.yml from this tool
+# (Copy from the green "Copy to Clipboard" button above)
+
+# Save and exit: Ctrl+O, Enter, Ctrl+X</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 4: Verify configuration files</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Check docker-compose.yml syntax
+cat docker-compose.yml
+
+# Check config.yml syntax
+cat config/config.yml
+
+# Verify directory structure
+ls -la /opt/frigate/
+ls -la /opt/frigate/config/</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 5: Start Frigate</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Start Frigate container
 docker compose up -d
-docker logs frigate | grep password</code></pre>
+
+# Verify container is running
+docker ps | grep frigate
+
+# Should show: frigate container with status "Up"</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 6: Get admin password from logs</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Wait 10-15 seconds for Frigate to fully start, then:
+docker logs frigate 2>&1 | grep -i password
+
+# Look for line like:
+# "Frigate admin user password: Xh9kL2mP5qR8tY"
+
+# COPY THIS PASSWORD IMMEDIATELY!</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 7: Access Frigate Web UI</p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>Open web browser on any device on your network</li>
+                            <li>Navigate to: <code>http://YOUR_SERVER_IP:8971</code></li>
+                            <li>Example: <code>http://192.168.1.100:8971</code></li>
+                            <li>Login with:
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Username: <code class="text-green-400">admin</code></li>
+                                    <li>Password: (from logs above)</li>
+                                </ul>
+                            </li>
+                        </ol>
+
+                        <p class="font-bold mt-4 mb-2">Step 8: Change password immediately</p>
+                        <ol class="list-decimal list-inside ml-4 space-y-1">
+                            <li>After login, click Settings (gear icon) in top right</li>
+                            <li>Navigate to Users tab</li>
+                            <li>Click "Update Password" for admin user</li>
+                            <li>Enter new strong password (use password manager!)</li>
+                            <li>Click Save</li>
+                            <li>Test login with new password</li>
+                        </ol>
+
+                        <p class="font-bold mt-4 mb-2">Step 9: Verify everything works</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Check logs for errors
+docker logs frigate --tail 100 | grep -i error
+
+# Verify go2rtc streams are working
+docker exec frigate curl -s http://127.0.0.1:1984/api/streams
+
+# Should show all your cameras with "producers" field populated
+
+# Check GPU access (if using Intel VAAPI)
+docker exec frigate ls -la /dev/dri
+
+# Check GPU access (if using NVIDIA)
+docker exec frigate nvidia-smi
+
+# Check Coral TPU (if using)
+docker exec frigate ls -la /dev/bus/usb  # for USB Coral
+docker exec frigate ls -la /dev/apex_0    # for PCIe Coral</code></pre>
+
+                        <p class="font-bold mt-4 mb-2">Step 10: Monitor Frigate</p>
+                        <pre class="bg-gray-900 rounded p-3"><code># Watch logs in real-time
+docker logs frigate -f
+
+# Check for any warnings or errors
+# Ctrl+C to stop watching
+
+# Check detection FPS (should be close to your configured FPS)
+docker logs frigate 2>&1 | grep "detection_fps"
+
+# Check storage usage
+df -h /mnt/frigate</code></pre>
+
+                        <p class="mt-4 text-yellow-300"><strong>⚠️ Common First-Startup Issues:</strong></p>
+                        <ul class="list-disc list-inside ml-4 text-sm">
+                            <li><strong>"No frames received":</strong> Check camera RTSP URLs, test in VLC first</li>
+                            <li><strong>GPU not detected:</strong> Verify device passthrough, check permissions</li>
+                            <li><strong>High CPU usage:</strong> Ensure hardware acceleration working, check detector config</li>
+                            <li><strong>Can't access UI:</strong> Check firewall, verify port 8971 not blocked</li>
+                            <li><strong>Coral not found:</strong> Install libedgetpu runtime, check USB permissions</li>
+                        </ul>
                     </div>
                 </section>
 
             </div>
         </div>
 
-        <!-- Architecture Tab -->
+        <!-- Architecture Tab - I'll continue with this in next message to keep it organized -->
         <div x-show="activeTab === 'architecture'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
-            <h2 class="text-3xl font-bold mb-6">🏗️ How Frigate Works</h2>
+            <h2 class="text-3xl font-bold mb-6">🏗️ How How Frigate Works - Complete Architecture</h2>
+            
             <div class="space-y-6 text-gray-300">
+                
                 <section>
-                    <h3 class="text-2xl font-bold mb-3">Architecture Overview</h3>
-                    <pre class="bg-gray-900 rounded p-4 text-xs">Camera RTSP Streams
-        ↓
-    go2rtc (Restreaming)
-        ↓
-    FFmpeg (Decoding)
-        ↓
-    ┌───────┴───────┐
-    ↓               ↓
-Detection       Recording
-(Sub stream)    (Main stream)
-    ↓               ↓
-Detector GPU    Disk Storage
-    ↓
-Object Tracking
-    ↓
-Events & MQTT</pre>
-                    <p class="mt-4"><strong>go2rtc:</strong> Converts RTSP to WebRTC/MSE for low-latency browser viewing</p>
-                    <p><strong>Detection:</strong> Motion triggers GPU inference → Objects tracked → Events created</p>
-                    <p><strong>Recording:</strong> Continuous or motion-based recording to disk</p>
+                    <h3 class="text-2xl font-bold mb-3">System Architecture Overview</h3>
+                    <pre class="bg-gray-900 rounded p-4 text-xs">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           FRIGATE NVR ARCHITECTURE                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    📹 IP Cameras (RTSP Streams)
+         │
+         ├─── Main Stream (1080p/4K @ 15fps, 4-8 Mbps) ──┐
+         │                                                 │
+         └─── Sub Stream (720p @ 5fps, 1-2 Mbps) ───────┐│
+                                                          ││
+         ┌────────────────────────────────────────────────┘│
+         ↓                                                  │
+    ┌─────────────────┐                                   │
+    │    go2rtc       │ (Restreaming Engine)              │
+    │  - RTSP → WebRTC│                                   │
+    │  - Low latency  │                                   │
+    │  - Browser view │                                   │
+    └─────────────────┘                                   │
+         │                                                  │
+         ↓                                                  ↓
+    ┌─────────────────────────────────────────────────────────┐
+    │                     FFmpeg                              │
+    │  - Decode H.264/H.265                                  │
+    │  - Hardware acceleration (VAAPI/NVENC)                 │
+    │  - Frame extraction                                    │
+    └─────────────────────────────────────────────────────────┘
+         │                                    │
+         │ (Sub stream frames)                │ (Main stream)
+         ↓                                    ↓
+    ┌──────────────────┐              ┌──────────────────┐
+    │  Motion Detection│              │   Recording      │
+    │  - Frame diff    │              │   - Continuous   │
+    │  - Threshold     │              │   - Events only  │
+    └──────────────────┘              │   - Segments     │
+         │                            └──────────────────┘
+         ↓ (motion detected)                    │
+    ┌──────────────────┐                       ↓
+    │  Object Detector │                  💾 Disk Storage
+    │  - OpenVINO GPU  │                  /mnt/frigate/
+    │  - Coral TPU     │                  ├── recordings/
+    │  - CPU/NVIDIA    │                  ├── clips/
+    └──────────────────┘                  └── snapshots/
+         │
+         ↓ (objects found)
+    ┌──────────────────┐
+    │  Object Tracking │
+    │  - Kalman filter │
+    │  - Multi-frame   │
+    │  - Zones         │
+    └──────────────────┘
+         │
+         ↓ (confirmed objects)
+    ┌──────────────────┐
+    │    Events        │
+    │  - Snapshots     │
+    │  - Clips         │
+    │  - Metadata      │
+    └──────────────────┘
+         │
+         ├─→ 🗄️ SQLite Database (events, stats)
+         │
+         └─→ 📡 MQTT Broker
+              ├─→ Home Assistant
+              ├─→ Notifications
+              └─→ Automations
+</pre>
                 </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">Detailed Component Breakdown</h3>
+                    
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-blue-400 mb-2">📡 go2rtc - The Restreaming Engine</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Purpose:</strong> Converts RTSP streams to modern web-compatible formats (WebRTC, MSE)</li>
+                            <li><strong>Why needed:</strong> RTSP doesn't work in browsers, adds 5-10 second latency</li>
+                            <li><strong>Benefits:</strong> Sub-second latency for live view, universal browser compatibility</li>
+                            <li><strong>Technology:</strong> WebRTC for bidirectional (two-way audio), MSE for viewing only</li>
+                            <li><strong>Resource usage:</strong> Minimal CPU (~1% per stream), no transcoding needed</li>
+                            <li><strong>Port:</strong> Internal port 1984, external WebRTC port 8555</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-green-400 mb-2">🎬 FFmpeg - The Video Processor</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Purpose:</strong> Decode camera streams, extract frames for analysis, encode recordings</li>
+                            <li><strong>Main stream processing:</strong> Decode → Segment → Write to disk (recordings)</li>
+                            <li><strong>Sub stream processing:</strong> Decode → Extract frames → Send to detector</li>
+                            <li><strong>Hardware acceleration:</strong> Offloads decoding/encoding to GPU (VAAPI/NVENC)</li>
+                            <li><strong>Why important:</strong> Without HW accel, CPU usage is 10-20% per camera</li>
+                            <li><strong>Configuration:</strong> Automatically configured based on your hardware selection</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-yellow-400 mb-2">👁️ Motion Detection - The First Filter</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Purpose:</strong> Reduce AI detector load by only processing frames with motion</li>
+                            <li><strong>How it works:</strong> Compare consecutive frames, calculate pixel differences</li>
+                            <li><strong>Threshold:</strong> Configurable sensitivity (default: 30 pixels changed)</li>
+                            <li><strong>Performance impact:</strong> Saves 70-90% of detector cycles on static cameras</li>
+                            <li><strong>Best practice:</strong> Always enable unless camera constantly moving (PTZ)</li>
+                            <li><strong>Masks:</strong> Exclude areas like trees, flags, busy roads from motion detection</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-purple-400 mb-2">🤖 Object Detector - The AI Brain</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Purpose:</strong> Identify objects (person, car, dog, etc.) in frames with motion</li>
+                            <li><strong>Input:</strong> 300×300 to 640×640 pixel frame (from sub stream)</li>
+                            <li><strong>Output:</strong> Bounding boxes with confidence scores (0-100%)</li>
+                            <li><strong>Frequency:</strong> Runs at detection FPS (typically 5fps, configurable)</li>
+                            <li><strong>Hardware options:</strong>
+                                <ul class="list-disc list-inside ml-6 text-xs">
+                                    <li>OpenVINO (Intel GPU): 5-10ms per frame, 10-15 cameras</li>
+                                    <li>Coral TPU: 10-15ms per frame, 10-15 cameras, 2W power</li>
+                                    <li>TensorRT (NVIDIA): 3-8ms per frame, 20+ cameras</li>
+                                    <li>CPU: 50-200ms per frame, 1-2 cameras only</li>
+                                </ul>
+                            </li>
+                            <li><strong>Models:</strong> Default SSDLite MobileNet v2, upgradable to YOLO variants</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-red-400 mb-2">🎯 Object Tracking - The Smart Filter</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Purpose:</strong> Track objects across multiple frames, reduce false positives</li>
+                            <li><strong>How it works:</strong> Uses Kalman filter to predict object movement between frames</li>
+                            <li><strong>Benefits:</strong> Single person walking = 1 event (not 50 separate detections)</li>
+                            <li><strong>Minimum frames:</strong> Object must appear in 3+ consecutive frames to trigger event</li>
+                            <li><strong>Zones:</strong> Only create events when object enters defined zones</li>
+                            <li><strong>Filtering:</strong> Min/max area, confidence threshold, object type filters</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-cyan-400 mb-2">📼 Recording Engine - The Storage Manager</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Continuous recording:</strong> 24/7 recording in 60-second segments</li>
+                            <li><strong>Event recording:</strong> Only record when objects detected (saves storage)</li>
+                            <li><strong>Retention:</strong> Separate policies for continuous vs event recordings</li>
+                            <li><strong>Segments:</strong> Files split every 60 seconds for easy seeking</li>
+                            <li><strong>Storage path:</strong> /mnt/frigate/recordings/CAMERA/DATE/HOUR/</li>
+                            <li><strong>Cleanup:</strong> Automatic deletion based on retention policies</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-green-400 mb-2">📸 Snapshots & Clips - The Evidence</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Snapshots:</strong> Best frame of each detected object (JPEG image)</li>
+                            <li><strong>Clips:</strong> Video segment with object present (MP4, usually 10-30 seconds)</li>
+                            <li><strong>Storage:</strong> /mnt/frigate/clips/ and /mnt/frigate/snapshots/</li>
+                            <li><strong>Thumbnails:</strong> Automatically generated for UI gallery view</li>
+                            <li><strong>Retention:</strong> Separate from recordings, typically 30+ days</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-orange-400 mb-2">🗄️ Database - The Event Logger</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Type:</strong> SQLite (single file, no server needed)</li>
+                            <li><strong>Location:</strong> /config/frigate.db</li>
+                            <li><strong>Contents:</strong> Events, object metadata, statistics, timelines</li>
+                            <li><strong>Size:</strong> Grows ~1-5 MB per day per camera</li>
+                            <li><strong>Backup critical:</strong> Contains all event history and search indexes</li>
+                            <li><strong>Performance:</strong> Store on SSD for fast queries</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-900 rounded p-4 mb-4">
+                        <p class="font-bold text-blue-400 mb-2">📡 MQTT - The Integration Layer</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li><strong>Purpose:</strong> Real-time event notifications and two-way control</li>
+                            <li><strong>Publishes:</strong> Object detections, camera status, statistics</li>
+                            <li><strong>Subscribes:</strong> Commands (enable/disable detection, snapshots, etc.)</li>
+                            <li><strong>Home Assistant:</strong> Auto-discovered, creates entities automatically</li>
+                            <li><strong>Automations:</strong> Trigger lights, sirens, notifications on detections</li>
+                            <li><strong>Topics:</strong> frigate/CAMERA/person, frigate/CAMERA/car, etc.</li>
+                        </ul>
+                    </div>
+
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">Data Flow Example: Person Detection</h3>
+                    <div class="bg-gray-900 rounded p-4 text-sm">
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li><strong>T=0ms:</strong> Camera sends RTSP stream → go2rtc receives both main and sub streams</li>
+                            <li><strong>T=10ms:</strong> FFmpeg decodes sub stream frame (720p) using GPU hardware acceleration</li>
+                            <li><strong>T=15ms:</strong> Motion detection compares frame to previous → detects 15% pixel change → triggers object detection</li>
+                            <li><strong>T=20ms:</strong> Frame resized to 300×300 pixels → sent to OpenVINO detector on Intel GPU</li>
+                            <li><strong>T=28ms:</strong> Detector identifies: "person" at 87% confidence, bounding box coordinates (x:450, y:200, w:80, h:180)</li>
+                            <li><strong>T=30ms:</strong> Object tracker receives detection → checks history → person not seen before → creates new tracked object ID</li>
+                            <li><strong>T=200ms:</strong> Person detected in frame 2 → tracker confirms same person (ID matches) → increments frame counter</li>
+                            <li><strong>T=400ms:</strong> Person detected in frame 3 → tracker confirms → threshold reached (3+ frames) → EVENT CREATED</li>
+                            <li><strong>T=405ms:</strong> 
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Snapshot saved: /mnt/frigate/snapshots/front_door/person-20251228-181234.jpg</li>
+                                    <li>MQTT message published: frigate/front_door/person → payload: "ON"</li>
+                                    <li>Database entry created: event ID, timestamp, camera, object type</li>
+                                    <li>Home Assistant notified → automation triggered → phone notification sent</li>
+                                </ul>
+                            </li>
+                            <li><strong>T=410ms onwards:</strong> Tracker continues following person across frames → updates bounding box → records movement path</li>
+                            <li><strong>T=5000ms (5 sec):</strong> Person exits frame → tracker holds object for 3 seconds (configurable timeout)</li>
+                            <li><strong>T=8000ms (8 sec):</strong> Timeout reached → person object marked as "left frame" → event ended</li>
+                            <li><strong>T=8100ms:</strong> 
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Clip created: 10-second video from main stream (5 sec before + 5 sec after)</li>
+                                    <li>Best snapshot selected: frame with highest confidence score (87%)</li>
+                                    <li>MQTT message: frigate/front_door/person → payload: "OFF"</li>
+                                    <li>Timeline updated in database with complete event duration</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p class="mt-4 text-yellow-300"><strong>Total time:</strong> 8.1 seconds from first detection to complete event logged</p>
+                        <p class="text-xs text-gray-400 mt-2">Performance varies based on hardware, model, and configuration. Example based on Intel 11th gen CPU with iGPU + OpenVINO detector.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">Performance Bottlenecks & Optimization</h3>
+                    <div class="space-y-3">
+                        <div class="bg-red-900 bg-opacity-30 border border-red-600 rounded p-3">
+                            <p class="font-bold text-red-400 mb-2">❌ Common Bottlenecks:</p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li><strong>CPU decoding without GPU:</strong> 20-40% CPU per camera → use VAAPI/NVENC</li>
+                                <li><strong>CPU detection:</strong> 100-400ms per frame → upgrade to GPU/Coral</li>
+                                <li><strong>High resolution detection:</strong> 1080p detection = 5x slower than 720p → use sub streams</li>
+                                <li><strong>VBR encoding:</strong> Variable bitrate causes frame drops → switch to CBR</li>
+                                <li><strong>Database on HDD:</strong> Slow queries, UI lag → move to SSD</li>
+                                <li><strong>No motion detection:</strong> Detector runs 100% of time → enable motion masks</li>
+                                <li><strong>High detection FPS:</strong> 10fps = 2x load vs 5fps → lower FPS unless needed</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-green-900 bg-opacity-30 border border-green-600 rounded p-3 mt-3">
+                            <p class="font-bold text-green-400 mb-2">✅ Optimization Checklist:</p>
+                            <ul class="list-disc list-inside ml-4 text-sm">
+                                <li>✓ Enable hardware acceleration (VAAPI/NVENC) for FFmpeg</li>
+                                <li>✓ Use dedicated detector (OpenVINO GPU or Coral TPU, not CPU)</li>
+                                <li>✓ Configure sub streams at 720p or lower for detection</li>
+                                <li>✓ Set cameras to CBR encoding mode</li>
+                                <li>✓ Enable motion detection on all cameras</li>
+                                <li>✓ Use motion masks to exclude high-motion areas (trees, roads)</li>
+                                <li>✓ Lower detection FPS to 5fps (or even 3fps for static cameras)</li>
+                                <li>✓ Store database on SSD, recordings on HDD</li>
+                                <li>✓ Set proper retention policies (don't keep 90 days if unnecessary)</li>
+                                <li>✓ Use zones to limit detection to areas of interest</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </div>
 
         <!-- Scripts Tab -->
         <div x-show="activeTab === 'scripts'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
-            <h2 class="text-3xl font-bold mb-6">💻 Useful Scripts</h2>
+            <h2 class="text-3xl font-bold mb-6">💻 Useful Scripts & Commands</h2>
+            
             <div class="space-y-6">
+                
                 <section>
-                    <h3 class="text-xl font-bold mb-2">Get Admin Password</h3>
-                    <pre class="bg-gray-900 rounded p-3"><code>docker logs frigate 2>&1 | grep -i password</code></pre>
+                    <h3 class="text-xl font-bold mb-3 text-blue-400">🔐 Authentication & Access</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Get initial admin password:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker logs frigate 2>&1 | grep -i password</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Reset admin password:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Add to config.yml:
+auth:
+  reset_admin_password: true
+
+# Restart and check logs:
+docker restart frigate
+docker logs frigate 2>&1 | grep -i password
+
+# REMOVE the line from config after getting new password!</code></pre>
+                    </div>
                 </section>
+
                 <section>
-                    <h3 class="text-xl font-bold mb-2">Check for Errors</h3>
-                    <pre class="bg-gray-900 rounded p-3"><code>docker logs frigate 2>&1 | grep -i error</code></pre>
+                    <h3 class="text-xl font-bold mb-3 text-green-400">🔍 Diagnostics & Monitoring</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Check for errors in logs:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker logs frigate 2>&1 | grep -i error</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Watch logs in real-time:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker logs frigate -f
+# Press Ctrl+C to stop</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check detection FPS for all cameras:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker logs frigate 2>&1 | grep "detection_fps"</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check inference speed (detector performance):</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker logs frigate 2>&1 | grep "inference_speed"</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">View camera stream status:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker exec frigate curl -s http://127.0.0.1:1984/api/streams | jq</code></pre>
+                    </div>
                 </section>
+
                 <section>
-                    <h3 class="text-xl font-bold mb-2">Verify go2rtc Streams</h3>
-                    <pre class="bg-gray-900 rounded p-3"><code>docker exec frigate curl -s http://127.0.0.1:1984/api/streams</code></pre>
+                    <h3 class="text-xl font-bold mb-3 text-purple-400">🖥️ Hardware Verification</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Check Intel GPU access (VAAPI):</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Inside container:
+docker exec frigate ls -la /dev/dri
+
+# Should show: card0, renderD128, etc.
+
+# Check GPU info:
+docker exec frigate vainfo
+# Requires intel-media-va-driver installed in container</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check NVIDIA GPU access:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker exec frigate nvidia-smi
+
+# Should display GPU name, memory, utilization</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check Google Coral TPU:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># USB Coral:
+docker exec frigate ls -la /dev/bus/usb
+
+# PCIe/M.2 Coral:
+docker exec frigate ls -la /dev/apex_0
+
+# If not found, check host:
+lsusb | grep "Google"
+ls /dev/apex_0</code></pre>
+                    </div>
                 </section>
+
                 <section>
-                    <h3 class="text-xl font-bold mb-2">Check GPU Access</h3>
-                    <pre class="bg-gray-900 rounded p-3"><code>docker exec frigate ls -la /dev/dri</code></pre>
+                    <h3 class="text-xl font-bold mb-3 text-yellow-400">💾 Storage Management</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Check overall storage usage:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>df -h /mnt/frigate</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check storage per camera:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>du -sh /mnt/frigate/recordings/*</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Find oldest recordings:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>find /mnt/frigate/recordings -type f -printf '%T+ %p\n' | sort | head -20</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check database size:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>du -sh /opt/frigate/config/frigate.db</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Manually clean old recordings (careful!):</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Delete recordings older than 7 days:
+find /mnt/frigate/recordings -type f -mtime +7 -delete
+
+# Delete specific camera recordings:
+rm -rf /mnt/frigate/recordings/front_door/2025-12-01/</code></pre>
+                    </div>
                 </section>
+
                 <section>
-                    <h3 class="text-xl font-bold mb-2">Storage Usage</h3>
-                    <pre class="bg-gray-900 rounded p-3"><code>df -h /mnt/frigate
-du -sh /mnt/frigate/recordings/*</code></pre>
+                    <h3 class="text-xl font-bold mb-3 text-red-400">🔄 Container Management</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Restart Frigate:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker restart frigate</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Stop Frigate:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker stop frigate</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Start Frigate:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker start frigate</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Update Frigate to latest stable:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>cd /opt/frigate
+docker compose pull
+docker compose up -d</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check Frigate version:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker exec frigate cat /VERSION</code></pre>
+                    </div>
                 </section>
+
+                <section>
+                    <h3 class="text-xl font-bold mb-3 text-cyan-400">🔧 Configuration Testing</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Test camera RTSP stream with FFmpeg:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Test if stream is accessible:
+ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate \
+  rtsp://admin:password@192.168.1.64/stream1
+
+# Test recording 10 seconds:
+ffmpeg -i rtsp://admin:password@192.168.1.64/stream1 -t 10 -c copy test.mp4</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Validate config.yml syntax:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Check for YAML syntax errors:
+docker run --rm -v /opt/frigate/config:/config \
+  ghcr.io/blakeblackshear/frigate:stable \
+  python3 -c "import yaml; yaml.safe_load(open('/config/config.yml'))"
+
+# If no output, syntax is valid!</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check go2rtc stream status:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>docker exec frigate curl -s http://127.0.0.1:1984/api/streams</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold mb-3 text-orange-400">📦 Backup & Restore</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Backup configuration:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>tar -czf frigate-config-$(date +%Y%m%d).tar.gz /opt/frigate/config/</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Backup database:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Stop Frigate first for clean backup:
+docker stop frigate
+
+# Copy database:
+cp /opt/frigate/config/frigate.db /backup/frigate-db-$(date +%Y%m%d).db
+
+# Start Frigate:
+docker start frigate</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Automated backup script:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>#!/bin/bash
+# Save as /usr/local/bin/backup-frigate.sh
+
+BACKUP_DIR="/mnt/backups/frigate"
+DATE=$(date +%Y%m%d_%H%M%S)
+mkdir -p "$BACKUP_DIR"
+
+echo "Backing up Frigate config and database..."
+
+# Backup config
+tar -czf "$BACKUP_DIR/config-$DATE.tar.gz" /opt/frigate/config/
+
+# Backup database (with Frigate stopped)
+docker stop frigate
+sleep 5
+cp /opt/frigate/config/frigate.db "$BACKUP_DIR/frigate-$DATE.db"
+docker start frigate
+
+# Backup recent clips (last 30 days)
+find /mnt/frigate/clips -mtime -30 -type f | \
+  tar -czf "$BACKUP_DIR/clips-$DATE.tar.gz" -T -
+
+# Delete backups older than 90 days
+find "$BACKUP_DIR" -mtime +90 -delete
+
+echo "Backup complete: $BACKUP_DIR"</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Schedule daily backups with cron:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>crontab -e
+
+# Add this line (runs daily at 3 AM):
+0 3 * * * /usr/local/bin/backup-frigate.sh >> /var/log/frigate-backup.log 2>&1</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Restore from backup:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Stop Frigate:
+docker stop frigate
+
+# Restore config:
+tar -xzf /backup/frigate-config-20251228.tar.gz -C /
+
+# Restore database:
+cp /backup/frigate-db-20251228.db /opt/frigate/config/frigate.db
+
+# Start Frigate:
+docker start frigate</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold mb-3 text-pink-400">🎬 Video Processing</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Create timelapse from recordings:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># 24-hour timelapse at 100x speed:
+ffmpeg -pattern_type glob -i '/mnt/frigate/recordings/front_door/2025-12-27/*/*.mp4' \
+  -vf "setpts=0.01*PTS,fps=30" \
+  -c:v libx264 -preset fast -crf 23 \
+  timelapse-front-door-2025-12-27.mp4
+
+# Result: 24 hours compressed to ~14 minutes</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Extract specific time range:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Extract 10 minutes starting from specific time:
+ffmpeg -ss 14:30:00 -i /mnt/frigate/recordings/front_door/2025-12-27/14/*.mp4 \
+  -t 00:10:00 -c copy output.mp4</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Convert clip to GIF:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code>ffmpeg -i /mnt/frigate/clips/front_door-person-20251227.mp4 \
+  -vf "fps=10,scale=480:-1:flags=lanczos" \
+  -c:v gif output.gif</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold mb-3 text-indigo-400">🌐 Network Troubleshooting</h3>
+                    <div class="bg-gray-900 rounded p-4">
+                        <p class="font-bold mb-2">Test camera connectivity:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Ping camera:
+ping -c 4 192.168.1.64
+
+# Check if RTSP port is open:
+telnet 192.168.1.64 554
+
+# Or with netcat:
+nc -zv 192.168.1.64 554</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Check Frigate port accessibility:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># From server:
+curl http://localhost:8971
+
+# From another computer:
+curl http://192.168.1.100:8971</code></pre>
+                        
+                        <p class="font-bold mb-2 mt-4">Monitor network bandwidth:</p>
+                        <pre class="bg-black rounded p-3 text-sm"><code># Install iftop:
+sudo apt install iftop
+
+# Monitor traffic:
+sudo iftop -i eth0
+
+# Or use docker stats:
+docker stats frigate</code></pre>
+                    </div>
+                </section>
+
             </div>
         </div>
 
         <!-- Advanced Tips Tab -->
         <div x-show="activeTab === 'advanced'" class="bg-gray-800 rounded-lg p-6 prose prose-invert max-w-none">
-            <h2 class="text-3xl font-bold mb-6">🚀 Pro Tips & Tricks</h2>
-            <ul class="list-disc list-inside space-y-2 text-gray-300">
-                <li><strong>Smart zones:</strong> Only trigger alerts in specific areas of the frame</li>
-                <li><strong>Home Assistant:</strong> Auto-discovered via MQTT for seamless integration</li>
-                <li><strong>Remote access:</strong> Use Tailscale VPN (never directly port-forward Frigate!)</li>
-                <li><strong>CBR encoding:</strong> Set cameras to constant bitrate for stable streams</li>
-                <li><strong>Lower detection FPS:</strong> 5fps is plenty, saves GPU resources</li>
-                <li><strong>Use sub streams:</strong> 720p for detection, 1080p/4K for recording</li>
-                <li><strong>Storage optimization:</strong> SSD for clips/database, HDD for recordings</li>
-                <li><strong>Regular backups:</strong> Config + database weekly, recordings optional</li>
-                <li><strong>Frigate+:</strong> Subscribe for cloud features and support development</li>
-            </ul>
+            <h2 class="text-3xl font-bold mb-6">🚀 Advanced Tips & Best Practices</h2>
+            
+            <div class="space-y-8">
+                
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">⚡ Performance Optimization</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Lower detection FPS:</strong> 5fps is plenty for most scenarios. Reducing to 3fps saves GPU while maintaining good detection. Use 10fps only for very fast-moving objects.</li>
+                            <li><strong>Use sub streams for detection:</strong> 720p is plenty for detection, don't use 1080p/4K. Higher resolution = slower detection with minimal accuracy gain.</li>
+                            <li><strong>Enable motion detection:</strong> Only runs object detection when motion present. Saves 70-90% GPU/CPU cycles on static cameras.</li>
+                            <li><strong>Optimize camera settings:</strong> Set cameras to CBR encoding, disable WDR/HDR on sub stream, lower bitrate on sub stream to minimum acceptable quality.</li>
+                            <li><strong>Use SSD for clips/snapshots:</strong> Faster UI response, less wear on spinning drives. Keep recordings on HDD (sequential writes are fine).</li>
+                            <li><strong>Reduce snapshot quality:</strong> Default 70% JPEG quality is good, can lower to 50-60% for storage savings with minimal visual impact.</li>
+                            <li><strong>Disable unused features:</strong> If not using audio detection, disable it. If not using all object types, filter to only what you need.</li>
+                            <li><strong>Limit recording retention:</strong> 7 days continuous + 30 days events is usually enough. Adjust based on your actual needs.</li>
+                            <li><strong>Use zones effectively:</strong> Only detect in areas that matter. Reduces false positives and unnecessary processing.</li>
+                            <li><strong>Motion masks:</strong> Exclude trees, flags, busy roads from motion detection to reduce detector load.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🌍 Secure Remote Access Methods</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <div class="bg-red-900 bg-opacity-30 border border-red-600 rounded p-4">
+                            <p class="font-bold text-red-400 mb-2">⚠️ NEVER expose Frigate directly to the internet!</p>
+                            <p class="text-sm">Port forwarding Frigate (port 8971) is a major security risk. Use these methods instead:</p>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Method 1: Tailscale VPN (Recommended - Easiest)</p>
+                            <p class="text-sm mb-2"><strong>Why it's best:</strong> Zero configuration NAT traversal, works behind CGNAT, free for personal use, WireGuard-based encryption</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Install Tailscale on Frigate server:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up</code></pre>
+                                </li>
+                                <li>Install Tailscale app on your phone/laptop</li>
+                                <li>Sign in with same account on all devices</li>
+                                <li>Access Frigate from anywhere: <code>http://TAILSCALE_IP:8971</code></li>
+                                <li>Find Tailscale IP: <code>tailscale ip -4</code></li>
+                            </ol>
+                            <p class="text-xs text-green-300 mt-2">✅ Fully encrypted, zero port forwarding, works everywhere, even on cellular/hotel WiFi</p>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Method 2: WireGuard VPN (Traditional VPN)</p>
+                            <p class="text-sm mb-2"><strong>When to use:</strong> You want full control, already have VPN server, or need to access other services too</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Install WireGuard on your router or Proxmox/server:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>sudo apt install wireguard</code></pre>
+                                </li>
+                                <li>Generate keys and configure WireGuard (many tutorials available)</li>
+                                <li>Forward only WireGuard port (e.g., 51820) through router</li>
+                                <li>Connect via WireGuard app on phone/laptop</li>
+                                <li>Access Frigate on LAN IP: <code>http://192.168.1.X:8971</code></li>
+                            </ol>
+                            <p class="text-xs text-yellow-300 mt-2">⚠️ Requires port forwarding (51820) and manual configuration</p>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Method 3: Cloudflare Tunnel (Advanced - No Port Forwarding)</p>
+                            <p class="text-sm mb-2"><strong>When to use:</strong> Behind CGNAT, no port forwarding possible, want HTTPS with custom domain</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Sign up for free Cloudflare account</li>
+                                <li>Add your domain to Cloudflare (or use Cloudflare registrar)</li>
+                                <li>Install cloudflared on Frigate server:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared.deb</code></pre>
+                                </li>
+                                <li>Authenticate: <code>cloudflared tunnel login</code></li>
+                                <li>Create tunnel: <code>cloudflared tunnel create frigate</code></li>
+                                <li>Configure tunnel to point to <code>localhost:8971</code></li>
+                                <li>Access via custom domain: <code>https://frigate.yourdomain.com</code></li>
+                            </ol>
+                            <p class="text-xs text-blue-300 mt-2">✅ Free, automatic HTTPS, no port forwarding, works behind CGNAT</p>
+                            <p class="text-xs text-red-300 mt-1">⚠️ Requires domain name and Cloudflare account, traffic passes through Cloudflare servers</p>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Method 4: Nginx Reverse Proxy + Let's Encrypt (Self-Hosted HTTPS)</p>
+                            <p class="text-sm mb-2"><strong>When to use:</strong> Want full control, already have domain, comfortable with web server administration</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Install Nginx and Certbot:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>sudo apt install nginx certbot python3-certbot-nginx</code></pre>
+                                </li>
+                                <li>Configure Nginx virtual host for Frigate</li>
+                                <li>Obtain Let's Encrypt SSL certificate:
+                                    <pre class="bg-black rounded p-2 mt-1"><code>sudo certbot --nginx -d frigate.yourdomain.com</code></pre>
+                                </li>
+                                <li>Add HTTP basic authentication for extra security</li>
+                                <li>Forward ONLY port 443 (HTTPS) through router to Nginx server</li>
+                                <li>Access: <code>https://frigate.yourdomain.com</code></li>
+                            </ol>
+                            <p class="text-xs text-green-300 mt-2">✅ Full control, self-hosted, professional HTTPS setup</p>
+                            <p class="text-xs text-yellow-300 mt-1">⚠️ Requires domain, port forwarding, and web server knowledge</p>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Method 5: Nebula Mesh VPN (For Tech Enthusiasts)</p>
+                            <p class="text-sm mb-2"><strong>When to use:</strong> Want peer-to-peer mesh network, maximum security, connecting multiple sites</p>
+                            <p class="text-xs">Nebula is a scalable overlay network created by Slack. Similar to Tailscale but self-managed.</p>
+                            <ul class="list-disc list-inside ml-6 text-xs mt-2">
+                                <li>More complex setup than Tailscale</li>
+                                <li>Better for large deployments (connecting multiple homes, offices)</li>
+                                <li>Fully open source and self-hosted</li>
+                                <li>Requires lighthouse server (can be small VPS)</li>
+                            </ul>
+                        </div>
+
+                        <p class="mt-4"><strong>Security Best Practices (All Methods):</strong></p>
+                        <ul class="list-disc list-inside ml-4 text-sm">
+                            <li>✅ Use strong, unique password for Frigate admin account</li>
+                            <li>✅ Enable two-factor authentication when available</li>
+                            <li>✅ Keep Frigate updated to latest stable version</li>
+                            <li>✅ Regularly review access logs</li>
+                            <li>✅ Use separate VLAN for cameras (isolate from main network)</li>
+                            <li>✅ Disable UPnP on router (prevents unauthorized port forwards)</li>
+                            <li>✅ Set camera passwords to strong values (not default admin/admin)</li>
+                            <li>❌ Never use port forwarding directly to Frigate (port 8971)</li>
+                            <li>❌ Never use default credentials on any component</li>
+                            <li>❌ Never trust "security by obscurity" (changing port doesn't help)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🏠 Home Assistant Integration Deep Dive</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>Frigate integrates seamlessly with Home Assistant via MQTT for powerful automations.</strong></p>
+                        
+                        <div class="bg-gray-900 rounded p-4">
+                            <p class="font-bold mb-2">Setup Steps:</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Ensure MQTT configured in Frigate (this tool does it for you)</li>
+                                <li>In Home Assistant: Configuration → Integrations → Add Integration</li>
+                                <li>Search for "Frigate" → Install</li>
+                                <li>Enter Frigate URL: <code>http://192.168.1.100:8971</code></li>
+                                <li>Frigate auto-discovers all cameras and creates entities</li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Example Automation: Alert on Person Detection</p>
+                            <pre class="bg-black rounded p-2 text-xs"><code class="language-yaml">automation:
+  - alias: "Notify on Person at Front Door"
+    trigger:
+      - platform: mqtt
+        topic: "frigate/front_door/person"
+        payload: "ON"
+    condition:
+      - condition: state
+        entity_id: alarm_control_panel.home
+        state: "armed_away"
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Person Detected"
+          message: "Someone is at the front door"
+          data:
+            image: "https://frigate.local:8971/api/front_door/person/snapshot.jpg"
+            actions:
+              - action: "VIEW_CLIP"
+                title: "View Clip"
+              - action: "DISMISS"
+                title: "Dismiss"</code></pre>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Example: Turn on Lights When Person Detected at Night</p>
+                            <pre class="bg-black rounded p-2 text-xs"><code class="language-yaml">automation:
+  - alias: "Front Porch Light on Person Detection"
+    trigger:
+      - platform: mqtt
+        topic: "frigate/front_door/person"
+        payload: "ON"
+    condition:
+      - condition: sun
+        after: sunset
+        before: sunrise
+    action:
+      - service: light.turn_on
+        target:
+          entity_id: light.front_porch
+        data:
+          brightness: 255
+      - delay: "00:05:00"
+      - service: light.turn_off
+        target:
+          entity_id: light.front_porch</code></pre>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">Example: Disable Detection When Home</p>
+                            <pre class="bg-black rounded p-2 text-xs"><code class="language-yaml">automation:
+  - alias: "Disable Frigate When Home"
+    trigger:
+      - platform: state
+        entity_id: person.john
+        to: "home"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.frigate_front_door_detect
+  
+  - alias: "Enable Frigate When Away"
+    trigger:
+      - platform: state
+        entity_id: person.john
+        to: "not_home"
+    action:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.frigate_front_door_detect</code></pre>
+                        </div>
+
+                        <p class="mt-3"><strong>Available Entities in Home Assistant:</strong></p>
+                        <ul class="list-disc list-inside ml-4 text-sm">
+                            <li><strong>Cameras:</strong> camera.frigate_CAMERA_NAME</li>
+                            <li><strong>Sensors:</strong> sensor.frigate_CAMERA_NAME_person_count (and car, dog, etc.)</li>
+                            <li><strong>Binary Sensors:</strong> binary_sensor.frigate_CAMERA_NAME_person (on/off state)</li>
+                            <li><strong>Switches:</strong> switch.frigate_CAMERA_NAME_detect (enable/disable detection)</li>
+                            <li><strong>Switches:</strong> switch.frigate_CAMERA_NAME_recordings (enable/disable recording)</li>
+                            <li><strong>Switches:</strong> switch.frigate_CAMERA_NAME_snapshots (enable/disable snapshots)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🎯 Zone Detection & Filtering</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <p><strong>Zones allow you to only trigger events when objects enter specific areas.</strong></p>
+                        
+                        <div class="bg-gray-900 rounded p-4">
+                            <p class="font-bold mb-2">Example: Only alert when person enters "porch" zone</p>
+                            <pre class="bg-black rounded p-2 text-xs"><code class="language-yaml">cameras:
+  front_door:
+    zones:
+      porch:
+        coordinates: 100,200,300,200,300,400,100,400
+        objects:
+          - person
+      driveway:
+        coordinates: 400,300,800,300,800,600,400,600
+        objects:
+          - person
+          - car
+    objects:
+      filters:
+        person:
+          mask: 50,50,150,50,150,150,50,150  # Exclude neighbor's yard
+          min_area: 2000  # Minimum 2000 pixels (filters out distant people)
+          max_area: 100000  # Maximum size (filters out vehicles misclassified as person)
+          min_score: 0.6  # 60% confidence minimum
+          threshold: 0.7  # 70% for tracking
+          min_ratio: 0.2  # Aspect ratio filter (prevents horizontal blobs)
+          max_ratio: 5.0</code></pre>
+                        </div>
+
+                        <div class="bg-gray-900 rounded p-4 mt-3">
+                            <p class="font-bold mb-2">How to create zones:</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Open Frigate UI → Camera → Debug view</li>
+                                <li>Click on the frame to get pixel coordinates</li>
+                                <li>Draw your zone on paper/screenshot</li>
+                                <li>Add coordinates to config (clockwise from top-left)</li>
+                                <li>Coordinates are x,y pairs: x1,y1,x2,y2,x3,y3,x4,y4</li>
+                            </ol>
+                        </div>
+
+                        <p class="mt-3"><strong>Filtering Best Practices:</strong></p>
+                        <ul class="list-disc list-inside ml-4 text-sm">
+                            <li><strong>min_area:</strong> Use to filter distant objects (person = 2000-5000 pixels, car = 8000-15000 pixels)</li>
+                            <li><strong>max_area:</strong> Prevent misclassifications (person shouldn't be bigger than 100000 pixels)</li>
+                            <li><strong>min_score:</strong> Detector confidence (0.5-0.7 good for person, 0.6-0.8 for vehicles)</li>
+                            <li><strong>min_ratio/max_ratio:</strong> Aspect ratio to filter weird shapes (person ~0.3-2.0, car ~1.5-3.5)</li>
+                            <li><strong>Zones:</strong> Only create events when object enters specific zone (ignore street traffic)</li>
+                            <li><strong>Masks:</strong> Permanently exclude areas from detection (trees, neighbor's yard, sky)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">💡 Pro Tips Collection</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Stationary object detection:</strong> Detect abandoned packages/bags by tracking objects that don't move for X minutes. Use <code>stationary</code> object filter with <code>threshold</code> parameter.</li>
+                            
+                            <li><strong>Pet vs Person differentiation:</strong> Use <code>min_area</code> to separate cats/dogs from people. People are typically 5000+ pixels, pets 1000-3000 pixels at typical camera distance.</li>
+                            
+                            <li><strong>Shadow reduction:</strong> Enable <code>improve_contrast</code> in camera config. Lower detection sensitivity near walls where shadows frequently appear.</li>
+                            
+                            <li><strong>Night mode optimization:</strong> Enable camera IR mode, use lower confidence thresholds for detection at night (0.5 instead of 0.7). Consider separate day/night zones if needed.</li>
+                            
+                            <li><strong>Multi-camera tracking:</strong> Track person across multiple cameras using MQTT + Home Assistant automation. Create "person entering house" event by chaining camera detections.</li>
+                            
+                            <li><strong>Custom labels:</strong> Train custom models using Frigate+ to detect specific objects (packages, specific vehicles, tools, specific animals).</li>
+                            
+                            <li><strong>Geofencing integration:</strong> Auto-disable detection when family is home via Home Assistant presence detection. Saves processing and prevents false alerts.</li>
+                            
+                            <li><strong>Smart retention:</strong> Keep recordings with events forever (or very long), delete no-event recordings after 3-7 days. Saves storage while keeping important footage.</li>
+                            
+                            <li><strong>Alert fatigue fix:</strong> Use cooldown periods in Home Assistant automations (don't alert on same person for 5-10 minutes). Prevents notification spam.</li>
+                            
+                            <li><strong>Privacy zones:</strong> Mask neighbor's windows/yards in detection config using motion mask coordinates. Respects privacy while maintaining your security.</li>
+                            
+                            <li><strong>False positive reduction:</strong> Increase <code>min_frames</code> from 3 to 5 or 10 for objects that must be present longer before alerting (reduces birds, reflections).</li>
+                            
+                            <li><strong>Audio detection:</strong> Frigate supports audio event detection (glass breaking, barking). Enable in config for additional alert triggers.</li>
+                            
+                            <li><strong>PTZ camera support:</strong> Frigate supports PTZ (pan-tilt-zoom) cameras with ONVIF protocol. Can auto-track detected objects.</li>
+                            
+                            <li><strong>License plate recognition:</strong> Use Frigate+ or third-party integration for LPR (License Plate Recognition). Requires dedicated model.</li>
+                            
+                            <li><strong>Facial recognition:</strong> Integrate with Double-Take or Compreface for facial recognition via MQTT integration.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">📱 Mobile App Access</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <div class="bg-gray-900 rounded p-4">
+                            <p class="font-bold mb-2">Official Mobile Access Methods:</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+                                <li><strong>Web UI:</strong> Just open <code>http://YOUR_IP:8971</code> in mobile browser. Works great, fully responsive!</li>
+                                <li><strong>Home Assistant App:</strong> Integrate Frigate → access via HA mobile app with full functionality</li>
+                                <li><strong>Frigate Mobile (iOS/Android):</strong> Third-party app "Frigate Viewer" available in app stores</li>
+                            </ul>
+
+                            <p class="mt-3 font-bold mb-2">Progressive Web App (PWA) - Best Mobile Experience:</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-1 text-sm">
+                                <li>Open Frigate UI in mobile browser (Chrome/Safari)</li>
+                                <li><strong>Android Chrome:</strong> Menu (⋮) → "Add to Home Screen"</li>
+                                <li><strong>iOS Safari:</strong> Share button (⬆) → "Add to Home Screen"</li>
+                                <li>Frigate icon appears on home screen like native app</li>
+                                <li>Opens full-screen without browser UI, acts like real app!</li>
+                            </ol>
+
+                            <p class="mt-3 text-xs text-green-300">✅ PWA gives app-like experience without app store, updates automatically</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-bold mb-3">🌟 Community Resources</h3>
+                    <div class="space-y-3 text-gray-300">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Official Documentation:</strong> <a href="https://docs.frigate.video" target="_blank" class="text-blue-400 hover:underline">docs.frigate.video</a> - Complete documentation with examples</li>
+                            
+                            <li><strong>GitHub Repository:</strong> <a href="https://github.com/blakeblackshear/frigate" target="_blank" class="text-blue-400 hover:underline">github.com/blakeblackshear/frigate</a> - Source code, issue tracker, feature requests</li>
+                            
+                            <li><strong>Reddit Community:</strong> <a href="https://reddit.com/r/frigate_nvr" target="_blank" class="text-blue-400 hover:underline">r/frigate_nvr</a> - Active community, setup help, show-off your configs</li>
+                            
+                            <li><strong>Home Assistant Forum:</strong> Search "Frigate" for hundreds of integration examples and automation ideas</li>
+                            
+                            <li><strong>YouTube Tutorials:</strong> Search "Frigate NVR tutorial" for video guides (Everything Smart Home, BeardedTinker, etc.)</li>
+                            
+                            <li><strong>Frigate+ Service:</strong> <a href="https://frigate.video/plus" target="_blank" class="text-blue-400 hover:underline">frigate.video/plus</a> - Cloud AI model training, supports development</li>
+                        </ul>
+
+                        <p class="mt-4 text-yellow-300"><strong>🙏 Remember to support the project:</strong></p>
+                        <p class="text-sm">Frigate is free and open source thanks to Blake Blackshear and contributors. If it saves you money or time, please consider donating or subscribing to Frigate+ to ensure continued development!</p>
+                    </div>
+                </section>
+
+            </div>
         </div>
 
     </div>
 
-    <footer class="text-center text-gray-500 text-sm py-8">
+    <footer class="text-center text-gray-500 text-sm py-8 border-t border-gray-700">
         <p>Frigate Configuration Generator v1.0 | Not affiliated with Frigate NVR</p>
         <p class="mt-2">Made with ❤️ for the Frigate community</p>
-        <p class="mt-2">Special thanks to Blake Blackshear and all Frigate contributors for their incredible work!</p>
+        <p class="mt-3 text-xs">Special thanks to <strong>Blake Blackshear</strong> and all Frigate contributors for their incredible work on this amazing open-source project!</p>
+        <p class="mt-2 text-xs">Please consider supporting Frigate: <a href="https://github.com/sponsors/blakeblackshear" class="text-purple-400 hover:underline" target="_blank">GitHub Sponsors</a> | <a href="https://frigate.video/plus" class="text-blue-400 hover:underline" target="_blank">Frigate+</a></p>
     </footer>
 
     <script>
@@ -509,6 +2110,7 @@ du -sh /mnt/frigate/recordings/*</code></pre>
                 hwAccel: 'vaapi',
                 detector: 'openvino',
                 detectionModel: 'ssdlite_mobilenet_v2',
+                coralDevice: 'usb',
                 hostIP: '192.168.1.100',
                 frigatePort: '8971',
                 storagePath: '/mnt/frigate',
@@ -575,6 +2177,18 @@ services:
               capabilities: [gpu]`;
                     }
 
+                    if (this.detector === 'edgetpu') {
+                        if (this.coralDevice === 'usb') {
+                            compose += `
+    devices:
+      - /dev/bus/usb:/dev/bus/usb`;
+                        } else if (this.coralDevice === 'pcie') {
+                            compose += `
+    devices:
+      - /dev/apex_0:/dev/apex_0`;
+                        }
+                    }
+
                     return compose;
                 },
 
@@ -610,6 +2224,9 @@ services:
                     if (this.detector === 'openvino') {
                         config += `
     device: GPU`;
+                    } else if (this.detector === 'edgetpu') {
+                        config += `
+    device: ${this.coralDevice}`;
                     }
                     
                     config += `
@@ -643,6 +2260,14 @@ services:
                                 path: '/config/model_cache/yolov9c.onnx',
                                 labelmap: '/openvino-model/coco_80cl.txt'
                             },
+                            'yolov10n': {
+                                width: 640,
+                                height: 640,
+                                tensor: 'nchw',
+                                pixel: 'bgr',
+                                path: '/config/model_cache/yolov10n.onnx',
+                                labelmap: '/openvino-model/coco_80cl.txt'
+                            },
                             'yolov11n': {
                                 width: 640,
                                 height: 640,
@@ -669,6 +2294,12 @@ services:
   input_pixel_format: ${modelConfig.pixel}
   path: ${modelConfig.path}
   labelmap_path: ${modelConfig.labelmap}
+
+`;
+                    } else if (this.detector === 'edgetpu') {
+                        config += `model:
+  path: /edgetpu_model.tflite
+  labelmap_path: /labelmap.txt
 
 `;
                     }
@@ -756,34 +2387,42 @@ services:
                     const gbPerDay = totalMbps * 24 * 0.45;
                     const totalGb = gbPerDay * this.retentionDays;
                     const totalTb = (totalGb / 1000).toFixed(2);
+                    const recommendedTb = Math.ceil(totalTb * 1.5);
                     
-                    return `${this.cameras.length} camera(s) × ${this.retentionDays} days retention = ~${totalTb} TB required. Recommendation: ${Math.ceil(totalTb * 1.5)} TB drive.`;
+                    return `${this.cameras.length} camera(s) × ${this.retentionDays} days retention = ~${totalTb} TB required. Recommendation: ${recommendedTb} TB drive for headroom.`;
                 },
 
                 copyToClipboard(type) {
                     const text = type === 'compose' ? this.generateDockerCompose() : this.generateConfig();
                     navigator.clipboard.writeText(text).then(() => {
-                        alert('✅ Copied to clipboard!');
+                        alert('✅ Copied to clipboard successfully!');
                     }).catch(() => {
+                        // Fallback for older browsers
                         const textarea = document.createElement('textarea');
                         textarea.value = text;
                         document.body.appendChild(textarea);
                         textarea.select();
                         document.execCommand('copy');
                         document.body.removeChild(textarea);
-                        alert('✅ Copied to clipboard!');
+                        alert('✅ Copied to clipboard successfully!');
                     });
                 }
             }
         }
 
+        // Syntax highlighting
         document.addEventListener('alpine:initialized', () => {
             setInterval(() => {
                 document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
+                    if (!block.classList.contains('hljs')) {
+                        hljs.highlightElement(block);
+                    }
                 });
             }, 500);
         });
     </script>
 </body>
 </html>
+
+
+                
