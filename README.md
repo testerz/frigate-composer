@@ -1,7 +1,7 @@
 # Frigate NVR Configuration Generator
 
 🎥 **Web-based tool to generate custom Frigate docker-compose.yml and config.yml files**
-
+THIS IS CREATED BY AI 100%
 ## Features
 
 ✅ Real-time configuration preview  
